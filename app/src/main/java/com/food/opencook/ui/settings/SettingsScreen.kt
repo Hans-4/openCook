@@ -31,14 +31,8 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -48,7 +42,6 @@ import com.food.opencook.R
 import com.food.opencook.ui.AppBarViewModel
 import com.food.opencook.ui.components.AppTopBar
 import com.food.opencook.ui.theme.Spacing
-import kotlinx.coroutines.launch
 
 /**
  * Settings hub. Every entry opens a sub-page; the subtitles carry the current state, so
@@ -132,15 +125,13 @@ fun SettingsScreen(
                 onClick = onOpenAppearance,
                 showChevron = true,
             )
-            if (joined) {
-                SettingsRow(
-                    icon = Icons.Outlined.Backup,
-                    title = stringResource(R.string.settings_backup),
-                    subtitle = lastBackup ?: stringResource(R.string.settings_backup_subtitle),
-                    onClick = onOpenBackup,
-                    showChevron = true,
-                )
-            }
+            SettingsRow(
+                icon = Icons.Outlined.Backup,
+                title = stringResource(R.string.settings_backup),
+                subtitle = lastBackup ?: stringResource(R.string.settings_backup_subtitle),
+                onClick = onOpenBackup,
+                showChevron = true,
+            )
             SettingsRow(
                 icon = Icons.Outlined.Info,
                 title = stringResource(R.string.settings_about),
