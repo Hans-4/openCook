@@ -59,16 +59,23 @@
         <item>rucula</item><item>espárrago</item><item>esparrago</item><item>alcachofa</item><item>remolacha</item>
         <item>brote</item><item>hierba</item><item>verdura</item><item>fruta</item><item>papa</item>
         <item>chile</item><item>durazno</item><item>palta</item><item>elote</item><item>ejote</item>
-        <item>banana</item><item>granada</item>
+        <item>banana</item><item>granada</item><item>albaricoque</item><item>ciruela</item><item>nectarina</item>
+        <item>pomelo</item><item>caqui</item><item>membrillo</item><item>dátil</item><item>higo</item>
+        <item>" mora"</item><item>fresón</item><item>endivia</item><item>escarola</item><item>rábano</item>
+        <item>boniato</item><item>chirivía</item><item>acelga</item><item>berro</item><item>canónigos</item>
+        <item>lombarda</item><item>nabo</item><item>cebolleta</item><item>chalota</item><item>cogollo</item>
+        <item>shiitake</item><item>grosella</item><item>paraguayo</item>
     </string-array>
     <string-array name="grocery_kw_bakery">
         <item>"pan "</item><item>panecillo</item><item>bollo</item><item>tostada</item><item>baguette</item>
         <item>croissant</item><item>cruasán</item><item>brioche</item><item>biscote</item><item>pita</item>
+        <item>picatostes</item>
     </string-array>
     <string-array name="grocery_kw_drinks">
         <item>agua</item><item>zumo</item><item>café</item><item>cafe</item><item>" té"</item>
         <item>infusión</item><item>refresco</item><item>gaseosa</item><item>cerveza</item><item>vino</item>
-        <item>cava</item><item>sidra</item><item>batido</item><item>jugo</item>
+        <item>cava</item><item>sidra</item><item>batido</item><item>jugo</item><item>vermut</item>
+        <item>horchata</item>
     </string-array>
     <string-array name="grocery_kw_spices">
         <item>"sal "</item><item>pimienta</item><item>pimentón</item><item>pimenton</item><item>curry</item>
@@ -86,6 +93,7 @@
         <item>levadura</item><item>miel</item><item>mermelada</item><item>chocolate</item><item>cacao</item>
         <item>polenta</item><item>sémola</item><item>aceituna</item><item>almendra</item><item>nuez</item>
         <item>"frutos secos"</item><item>galleta</item><item>frijol</item><item>poroto</item><item>nueces</item>
+        <item>pepinillo</item>
     </string-array>
     <string-array name="grocery_kw_dairy">
         <item>leche</item><item>nata</item><item>mantequilla</item><item>yogur</item><item>queso</item>
@@ -132,7 +140,9 @@
         <item>ramitas</item><item>hoja</item><item>hojas</item><item>cabeza</item><item>cabezas</item>
         <item>tallo</item><item>tallos</item><item>gota</item><item>gotas</item><item>chorro</item>
         <item>chorrito</item><item>chorritos</item><item>puñado</item><item>puñados</item><item>oz</item>
-        <item>lb</item><item>lbs</item><item>libra</item><item>libras</item>
+        <item>lb</item><item>lbs</item><item>libra</item><item>libras</item><item>mililitro</item>
+        <item>mililitros</item><item>centilitro</item><item>centilitros</item><item>decilitro</item><item>decilitros</item>
+        <item>miligramo</item><item>miligramos</item>
     </string-array>
 
     <!-- Main-protein keywords for the meal-planner variety scoring (substring match, lower-case).
@@ -250,7 +260,10 @@
         <item>"vasos de"</item><item>"taza de"</item><item>"tazas de"</item><item>"bol de"</item><item>"manojo de"</item>
         <item>"puñado de"</item><item>"gota de"</item><item>"gotas de"</item><item>"chorrito de"</item><item>"chorro de"</item>
         <item>"ramita de"</item><item>"ramitas de"</item><item>"trozo de"</item><item>"trozos de"</item><item>"unidad de"</item>
-        <item>"unidades de"</item>
+        <item>"unidades de"</item><item>mililitro</item><item>mililitros</item><item>centilitro</item><item>centilitros</item>
+        <item>decilitro</item><item>decilitros</item><item>miligramo</item><item>miligramos</item><item>"mililitro de"</item>
+        <item>"mililitros de"</item><item>"centilitro de"</item><item>"centilitros de"</item><item>"decilitro de"</item><item>"decilitros de"</item>
+        <item>"miligramo de"</item><item>"miligramos de"</item>
     </string-array>
 
     <!-- "aceite para freír" is still oil. Not "al"/"con" — they join real dish names. -->

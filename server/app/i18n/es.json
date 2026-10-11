@@ -80,7 +80,15 @@
     "cucharadita",
     "cucharaditas",
     "cdta",
-    "cdtas"
+    "cdtas",
+    "mililitro",
+    "mililitros",
+    "centilitro",
+    "centilitros",
+    "decilitro",
+    "decilitros",
+    "miligramo",
+    "miligramos"
   ],
   "category_aliases": {
     "pastas": "pasta",
