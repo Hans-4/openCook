@@ -31,7 +31,6 @@ import com.food.opencook.sync.Hlc
 import com.food.opencook.sync.MessageRecorder
 import com.food.opencook.sync.Stamper
 import com.food.opencook.sync.SyncTrigger
-import com.food.opencook.util.IngredientStaples
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -149,11 +148,7 @@ class ShoppingConsolidationTest {
         assertEquals(500.0, item.quantity!!, 0.0001)
     }
 
-    /**
-     * A dish for the add paths. Keep the ingredients **off** [IngredientStaples.ALL] unless a
-     * test is about staples: `addFromRecipe` drops those, so a fixture built from "Mehl" or
-     * "Zucker" would silently produce an empty list.
-     */
+    /** A dish for the add paths. */
     private fun recipe(id: String, vararg ingredients: Pair<String, Double>): RecipeWithDetails =
         RecipeWithDetails(
             recipe = RecipeEntity(id = id, name = "R-$id", createdAt = 0, updatedAt = 0),
@@ -187,12 +182,12 @@ class ShoppingConsolidationTest {
     }
 
     @Test
-    fun `addFromRecipe does not persist staple ingredients`() = runTest {
+    fun `addFromRecipe keeps basics like salt - only the pantry decides`() = runTest {
         val dao = InMemoryShoppingDao()
-        // Salt is hidden by every screen including the skip chip, so a row for it could never
-        // be seen, ticked or deleted — it must not exist in the first place.
+        // GitHub #26: what counts as "always at home" differs per household, so no built-in
+        // list drops salt here; a household that has it keeps it in the pantry.
         repo(dao).addFromRecipe(recipe("r1", "Zwiebeln" to 500.0, "Salz" to 5.0))
-        assertEquals(listOf("Zwiebeln"), dao.items.map { it.text })
+        assertEquals(listOf("Zwiebeln", "Salz"), dao.items.map { it.text })
     }
 
     /** Issue #9: clearing the list must not leave a dish permanently un-addable. */
@@ -206,7 +201,7 @@ class ShoppingConsolidationTest {
         assertTrue(dao.items.isEmpty())
 
         r.addFromRecipe(rec)
-        assertEquals(listOf("Zwiebeln"), dao.items.map { it.text })
+        assertEquals(listOf("Zwiebeln", "Salz"), dao.items.map { it.text })
     }
 
     @Test

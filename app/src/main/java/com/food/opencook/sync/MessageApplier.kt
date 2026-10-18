@@ -284,7 +284,15 @@ class MessageApplier @Inject constructor(
                     return
                 }
                 val now = System.currentTimeMillis()
-                pantryDao.upsert(PantryItemEntity(id = rowId, name = str("name") ?: "", createdAt = now, updatedAt = now))
+                pantryDao.upsert(
+                    PantryItemEntity(
+                        id = rowId,
+                        name = str("name") ?: "",
+                        createdAt = now,
+                        updatedAt = now,
+                        basic = MessageCodec.decodeNullableBoolean(winning["basic"]),
+                    ),
+                )
             }
             SyncDatasets.MEALPLAN -> {
                 if (MessageCodec.isTrue(winning[SyncDatasets.COLUMN_DELETED])) {

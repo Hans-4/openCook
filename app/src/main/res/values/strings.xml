@@ -232,6 +232,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Add pantry item…</string>
     <string name="pantry_empty">No pantry items yet.</string>
+    <string name="pantry_basics">Basics (always in stock)</string>
+    <string name="pantry_basics_show">Show basics</string>
+    <string name="pantry_basics_hide">Hide basics</string>
+    <string name="pantry_basics_empty">Drag an item here so cooking never uses it up</string>
+    <string name="pantry_moved_to_basics">%1$s → basics</string>
+    <string name="pantry_moved_from_basics">%1$s → regular stock</string>
     <string name="shopping_added">Added to shopping list</string>
 
     <!-- Meal plan -->

@@ -238,6 +238,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Añadir a la despensa…</string>
     <string name="pantry_empty">Aún no hay nada en la despensa.</string>
+    <string name="pantry_basics">Básicos (siempre en casa)</string>
+    <string name="pantry_basics_show">Mostrar básicos</string>
+    <string name="pantry_basics_hide">Ocultar básicos</string>
+    <string name="pantry_basics_empty">Arrastra aquí lo que nunca se gasta al cocinar</string>
+    <string name="pantry_moved_to_basics">%1$s → básicos</string>
+    <string name="pantry_moved_from_basics">%1$s → despensa normal</string>
     <string name="shopping_added">Añadido a la lista de la compra</string>
 
     <!-- Meal plan -->

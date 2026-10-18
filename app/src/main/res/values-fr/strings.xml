@@ -238,6 +238,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Ajouter au garde-manger…</string>
     <string name="pantry_empty">Aucun élément dans le garde-manger.</string>
+    <string name="pantry_basics">Produits de base (toujours là)</string>
+    <string name="pantry_basics_show">Afficher les produits de base</string>
+    <string name="pantry_basics_hide">Masquer les produits de base</string>
+    <string name="pantry_basics_empty">Glissez ici ce que la cuisine n’épuise jamais</string>
+    <string name="pantry_moved_to_basics">%1$s → produits de base</string>
+    <string name="pantry_moved_from_basics">%1$s → stock normal</string>
     <string name="shopping_added">Ajouté à la liste de courses</string>
 
     <!-- Meal plan -->

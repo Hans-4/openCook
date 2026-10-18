@@ -234,6 +234,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Standardzutat hinzufügen…</string>
     <string name="pantry_empty">Noch keine Standardzutaten.</string>
+    <string name="pantry_basics">Grundzutaten (immer da)</string>
+    <string name="pantry_basics_show">Grundzutaten anzeigen</string>
+    <string name="pantry_basics_hide">Grundzutaten ausblenden</string>
+    <string name="pantry_basics_empty">Hierher ziehen, was beim Kochen nie aufgebraucht wird</string>
+    <string name="pantry_moved_to_basics">%1$s → Grundzutaten</string>
+    <string name="pantry_moved_from_basics">%1$s → normaler Vorrat</string>
     <string name="shopping_added">Zur Einkaufsliste hinzugefügt</string>
 
     <!-- Meal plan -->

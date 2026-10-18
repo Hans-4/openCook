@@ -22,7 +22,6 @@ import com.food.opencook.data.local.dao.ShoppingDao
 import com.food.opencook.data.local.entity.ShoppingItemEntity
 import com.food.opencook.data.local.relation.RecipeWithDetails
 import com.food.opencook.util.IngredientMatch
-import com.food.opencook.util.IngredientStaples
 import com.food.opencook.util.Numbers
 import com.food.opencook.sync.MessageRecorder
 import com.food.opencook.sync.ShoppingMessageEncoder
@@ -259,12 +258,11 @@ class ShoppingRepository @Inject constructor(
      * Add a recipe's ingredients to the list (amount → quantity). [sourceDate] tags the
      * items with their planned day so the "not found" flow can find the dish to replace.
      *
-     * Pantry-covered ingredients still become rows: hiding those is the view layer's job
-     * (`ShoppingListViewModel`), and keeping the row means it stays syncable and resurfaces
-     * via the "brauch ich doch" chip or once the pantry item is gone. **Staples are dropped
-     * here**, because their exclusion is permanent and non-recoverable: no screen ever shows
-     * them, not even the skip chip, so a staple row would be a line the user can never see,
-     * tick or delete — and one that silently blocks every later add of this dish (issue #9).
+     * Every ingredient becomes a row — basics like salt included: whether one is needed is
+     * the pantry's call, which the household edits (GitHub #26), not a built-in list. Hiding
+     * pantry-covered rows is the view layer's job (`ShoppingListViewModel`), and keeping the
+     * row means it stays syncable and resurfaces via the "brauch ich doch" chip or once the
+     * pantry item is gone.
      */
     suspend fun addFromRecipe(
         recipe: RecipeWithDetails,
@@ -292,7 +290,6 @@ class ShoppingRepository @Inject constructor(
         val created = mutableListOf<String>()
         val modified = mutableListOf<ShoppingItemEntity>()
         recipe.ingredients.sortedBy { it.position }
-            .filterNot { IngredientStaples.isStaple(it.name) }
             .forEach { ingredient ->
                 val (id, before) = addItemTracked(
                     text = ingredient.name,
