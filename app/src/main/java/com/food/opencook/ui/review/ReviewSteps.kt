@@ -127,6 +127,7 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import com.food.opencook.R
 import com.food.opencook.util.MealTypes
+import com.food.opencook.util.PastedList
 import com.food.opencook.util.RecipeCategories
 import com.food.opencook.ui.theme.Spacing
 import kotlin.math.roundToInt
@@ -425,6 +426,7 @@ fun IngredientsStep(
                     it.copy(ingredients = it.ingredients.mapIndexed { j, ing -> if (j == i) transform(ing) else ing })
                 }
             },
+            onPasteList = { text -> viewModel.pasteIngredients(index, i, text) },
             onApplySuggestion = { viewModel.applySuggestion(index, i) },
             onRemove = { viewModel.removeIngredient(index, i) },
         )
@@ -437,6 +439,7 @@ private fun IngredientCard(
     modifier: Modifier,
     fieldModifier: Modifier,
     onChange: ((EditableIngredient) -> EditableIngredient) -> Unit,
+    onPasteList: (String) -> Unit,
     onApplySuggestion: () -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -450,9 +453,18 @@ private fun IngredientCard(
                 OutlinedTextField(
                     value = ingredient.name,
                     onValueChange = { v ->
-                        onChange { it.copy(name = v, suggestion = null, autoCorrected = false) }
+                        // A name never holds a line break, so one arriving is a pasted list.
+                        if ('\n' in v) onPasteList(v)
+                        else onChange { it.copy(name = v, suggestion = null, autoCorrected = false) }
                     },
-                    label = { Text(stringResource(R.string.wizard_ingredient_name)) },
+                    // While empty the label carries the paste hint: a placeholder would only
+                    // show once the field is focused.
+                    label = {
+                        Text(stringResource(
+                            if (ingredient.name.isEmpty()) R.string.review_paste_hint_ingredient
+                            else R.string.wizard_ingredient_name,
+                        ))
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().then(fieldModifier),
                 )
@@ -524,6 +536,7 @@ fun StepsStep(
                     it.copy(instructions = it.instructions.mapIndexed { j, s -> if (j == i) s.copy(text = v) else s })
                 }
             },
+            onPasteList = { text -> viewModel.pasteSteps(index, i, text) },
             onRemove = { viewModel.removeStep(index, i) },
         )
     }
@@ -536,6 +549,7 @@ private fun StepCard(
     modifier: Modifier,
     fieldModifier: Modifier,
     onChange: (String) -> Unit,
+    onPasteList: (String) -> Unit,
     onRemove: () -> Unit,
 ) {
     Card(
@@ -560,7 +574,9 @@ private fun StepCard(
             Spacer(Modifier.width(Spacing.md))
             OutlinedTextField(
                 value = text,
-                onValueChange = onChange,
+                // A typed Enter stays a line break; several lines pasted at once are a list.
+                onValueChange = { v -> if (PastedList.isPastedSteps(text, v)) onPasteList(v) else onChange(v) },
+                placeholder = { Text(stringResource(R.string.review_paste_hint_step)) },
                 modifier = Modifier.weight(1f).then(fieldModifier),
                 minLines = 2,
             )

@@ -65,6 +65,16 @@
     <string name="review_notes">Notizen</string>
     <string name="review_add_ingredient">Zutat hinzufügen</string>
     <string name="review_add_step">Schritt hinzufügen</string>
+    <string name="review_paste_hint_ingredient">Zutat – oder ganze Liste einfügen</string>
+    <string name="review_paste_hint_step">Schritt beschreiben – oder alle Schritte einfügen</string>
+    <plurals name="review_pasted_ingredients">
+        <item quantity="one">In %1$d Zutat aufgeteilt</item>
+        <item quantity="other">In %1$d Zutaten aufgeteilt</item>
+    </plurals>
+    <plurals name="review_pasted_steps">
+        <item quantity="one">In %1$d Schritt aufgeteilt</item>
+        <item quantity="other">In %1$d Schritte aufgeteilt</item>
+    </plurals>
     <string name="review_save">Speichern</string>
     <string name="review_image_take">Foto aufnehmen</string>
     <string name="review_image_gallery">Galerie</string>

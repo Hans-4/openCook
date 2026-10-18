@@ -66,6 +66,16 @@
     <string name="review_notes">Notes</string>
     <string name="review_add_ingredient">Add ingredient</string>
     <string name="review_add_step">Add step</string>
+    <string name="review_paste_hint_ingredient">Ingredient — or paste a whole list</string>
+    <string name="review_paste_hint_step">Describe the step — or paste all steps</string>
+    <plurals name="review_pasted_ingredients">
+        <item quantity="one">Split into %1$d ingredient</item>
+        <item quantity="other">Split into %1$d ingredients</item>
+    </plurals>
+    <plurals name="review_pasted_steps">
+        <item quantity="one">Split into %1$d step</item>
+        <item quantity="other">Split into %1$d steps</item>
+    </plurals>
     <string name="review_save">Save</string>
     <string name="review_image_take">Take photo</string>
     <string name="review_image_gallery">Gallery</string>
