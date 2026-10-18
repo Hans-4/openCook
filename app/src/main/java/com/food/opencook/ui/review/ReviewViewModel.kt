@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 /** Linear wizard the editor walks the user through. Order matches array index for the
@@ -110,6 +111,7 @@ data class EditableRecipe(
  * [suggestion]/[autoCorrected] are UI-only review hints from the ingredient corrector
  * (never persisted): a non-null [suggestion] offers a tap-to-apply fix, [autoCorrected] marks
  * a name the corrector already snapped to a known term.
+ * [rowKey] identifies the row in the editor list while it is dragged (see [EditableInstruction]).
  */
 data class EditableIngredient(
     val id: String?,
@@ -118,9 +120,18 @@ data class EditableIngredient(
     val name: String,
     val suggestion: String? = null,
     val autoCorrected: Boolean = false,
+    val rowKey: Long = nextRowKey(),
 )
 
-data class EditableInstruction(val id: String?, val text: String)
+/**
+ * [rowKey] is a UI-only list key, never persisted: the drag-to-reorder list needs one that is
+ * unique and survives a move, and [id] is null for every freshly added row. `copy()` keeps it.
+ */
+data class EditableInstruction(val id: String?, val text: String, val rowKey: Long = nextRowKey())
+
+private val rowKeys = AtomicLong()
+
+private fun nextRowKey(): Long = rowKeys.incrementAndGet()
 
 data class EditableNutrition(
     val calories: String,
