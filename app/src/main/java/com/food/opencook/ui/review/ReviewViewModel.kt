@@ -106,6 +106,7 @@ data class EditableRecipe(
     val lastCookedAt: String? = null,
     val totalTime: String? = null,
     val description: String? = null,
+    val sourceUrl: String? = null,
 )
 
 /**
@@ -528,6 +529,7 @@ class ReviewViewModel @Inject constructor(
             cookTime = DurationFormat.toIso(e.cookTime),
             totalTime = e.totalTime,
             description = e.description,
+            sourceUrl = e.sourceUrl,
             tags = e.tags,
             lastCookedAt = e.lastCookedAt,
             sourcePhotoId = e.sourcePhotoId,
@@ -586,6 +588,7 @@ private fun RecipeWithDetails.toEditable() = EditableRecipe(
     lastCookedAt = recipe.lastCookedAt,
     totalTime = recipe.totalTime,
     description = recipe.description,
+    sourceUrl = recipe.sourceUrl,
     ingredients = ingredients.sortedBy { it.position }
         .map { EditableIngredient(it.id, Numbers.formatQuantity(it.quantity).orEmpty(), it.unit.orEmpty(), it.name) },
     instructions = instructions.sortedBy { it.position }.map { EditableInstruction(it.id, it.text) },

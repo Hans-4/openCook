@@ -206,6 +206,7 @@
     <string name="shopping_nf_adapt">Marcar como hecho</string>
     <string name="shopping_adapted">Marcado como hecho</string>
     <string name="scan_manual">Crear a mano</string>
+    <string name="recipe_open_source">Abrir la receta original</string>
     <string name="recipe_add_to_plan">Añadir al plan semanal</string>
     <string name="recipe_plan_sheet_title">Elige un día</string>
     <string name="recipe_plan_added">Añadida al %1$s</string>

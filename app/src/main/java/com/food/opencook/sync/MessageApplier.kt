@@ -181,6 +181,7 @@ class MessageApplier @Inject constructor(
                         tags = str("tags"),
                         lastCookedAt = str("lastCookedAt"),
                         cookbook = str("cookbook"),
+                        sourceUrl = str("sourceUrl"),
                         servings = MessageCodec.decodeNullableInt(winning["servings"]),
                         category = str("category"),
                         mealTypes = str("mealTypes"),

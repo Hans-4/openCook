@@ -198,6 +198,7 @@
     <string name="shopping_nf_adapt">Mark as done</string>
     <string name="shopping_adapted">Marked as done</string>
     <string name="scan_manual">Create manually</string>
+    <string name="recipe_open_source">Open original recipe</string>
     <string name="recipe_add_to_plan">Add to week plan</string>
     <string name="recipe_plan_sheet_title">Choose a day</string>
     <string name="recipe_plan_added">Added for %1$s</string>

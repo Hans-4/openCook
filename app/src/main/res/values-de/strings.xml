@@ -200,6 +200,7 @@
     <string name="shopping_nf_adapt">Als erledigt markieren</string>
     <string name="shopping_adapted">Als erledigt markiert</string>
     <string name="scan_manual">Manuell erstellen</string>
+    <string name="recipe_open_source">Originalrezept öffnen</string>
     <string name="recipe_add_to_plan">Zum Wochenplan</string>
     <string name="recipe_plan_sheet_title">Tag wählen</string>
     <string name="recipe_plan_added">Hinzugefügt für %1$s</string>

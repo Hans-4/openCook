@@ -316,4 +316,16 @@ class RecipeImportParserTest {
         assertEquals("g", ing.unit)
         assertEquals("Mehl", ing.name)
     }
+
+    @Test
+    fun pageUrlFromUrlOrMainEntityOfPage() {
+        // GitHub #31: the page a recipe came from, schema.org `url` first.
+        assertEquals("https://example.org/a", parse("""{"@type":"Recipe","name":"A","recipeIngredient":["1 Ei"],"url":"https://example.org/a"}""")[0].url)
+        assertEquals("https://example.org/b", parse(
+            """{"@type":"Recipe","name":"B","recipeIngredient":["1 Ei"],"mainEntityOfPage":{"@type":"WebPage","@id":"https://example.org/b"}}""",
+        )[0].url)
+        assertEquals("https://example.org/c", parse("""{"@type":"Recipe","name":"C","recipeIngredient":["1 Ei"],"mainEntityOfPage":"https://example.org/c"}""")[0].url)
+        // Not a web address: no link.
+        assertNull(parse("""{"@type":"Recipe","name":"D","recipeIngredient":["1 Ei"],"url":"recipe-123"}""")[0].url)
+    }
 }
