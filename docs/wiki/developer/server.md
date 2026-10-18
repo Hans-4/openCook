@@ -13,7 +13,7 @@ server/app/
   models.py        # ORM: Household, ServerConfig, SyncMessage, ImportRecord, Job
   schemas.py       # Pydantic request/response DTOs
   extraction.py    # qwen2.5vl pipeline → schema.org/Recipe + cropped photos
-  ollama_client.py # async HTTP client to Ollama (retries/backoff)
+  vision_client.py # async OpenAI-compatible client for the vision model (retries/backoff)
   worker.py        # background job loop
   sync.py          # HLC + per-field LWW + Merkle trie  (see sync.md)
   discovery.py     # mDNS advertiser (_opencook._tcp)
@@ -52,7 +52,7 @@ ORM tables (`models.py`):
 
 1. **Orient & resize** — `ImageOps.exif_transpose`, then `_smart_resize` to longest side ≤ 1008 px
    with both dimensions a multiple of 28 (qwen2.5vl's pixel budget; keeps box coords mapping 1:1).
-2. **Text call** — the content-language prompt (`load_i18n(language).text_prompt`) → Ollama →
+2. **Text call** — the content-language prompt (`load_i18n(language).text_prompt`) → vision model →
    `{"recipes": [{title, servings, category, tags, prep_time, cook_time, ingredients[], steps[],
    nutrition, notes}]}` (lenient JSON parse). `category` is a universal key (`pasta/meat/…`).
 3. **Box call** — `box_prompt` → `{"dish_photos": [{recipe_title, box:[x1,y1,x2,y2]}]}` in
@@ -63,8 +63,14 @@ ORM tables (`models.py`):
    (`openCookIngredients`, `openCookServings`, `openCookCategory`, `openCookTags`, `openCookNotes`,
    `openCookSourcePhoto`), `nutrition` (only if printed), and ISO-8601 `prepTime`/`cookTime`.
 
-Ollama is reached via `ollama_client.py` at `OPENCOOK_OLLAMA_BASE_URL`, model
-`OPENCOOK_OLLAMA_MODEL` (default `qwen2.5vl:7b`), with retries + backoff on transport/5xx errors.
+The model is reached via `vision_client.py` over the OpenAI chat-completions API at
+`OPENCOOK_VISION_BASE_URL` (default: the local Ollama at `http://localhost:11434/v1`), model
+`OPENCOOK_VISION_MODEL` (default `qwen2.5vl:7b`), optional `OPENCOOK_VISION_API_KEY`. Besides the
+required fields only `OPENCOOK_VISION_PARAMS` (a JSON object) is sent; its default is tuned for Ollama:
+`temperature` `0.0001` as in qwen2.5vl's Modelfile (Ollama's `/v1` ignores the Modelfile and would
+sample at 1.0) and `response_format` `json_object`. Retries + backoff on transport/429/5xx errors; a
+4xx is logged with the endpoint's message and fails the job. At startup the server warns if
+the endpoint resolves outside the home network.
 
 **Localization:** prompts, duration words, units and category aliases live in per-language JSON
 under `app/i18n/` (`en.json` = source/fallback), loaded by `load_i18n(language)` where `language`
@@ -84,7 +90,8 @@ is the household content language sent with the job. Adding a language = a new `
 ## Config
 
 All env vars are prefixed `OPENCOOK_` (`config.py`, `.env` supported): `DATA_DIR`, `HOST`, `PORT`,
-`SERVER_NAME`, `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `WORKER_POLL_INTERVAL`, `BACKUP_DIR`,
+`SERVER_NAME`, `VISION_BASE_URL`, `VISION_MODEL`, `VISION_API_KEY`, `VISION_PARAMS`,
+`WORKER_POLL_INTERVAL`, `BACKUP_DIR`,
 `BACKUP_KEEP`, `ADMIN_PASSWORD`. See the table in [Self-hosting](self-hosting.md).
 
 ## Tests

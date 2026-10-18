@@ -22,7 +22,7 @@ from app.extraction import (
 
 
 class FakeClient:
-    """Stand-in for OllamaClient: returns canned JSON depending on the prompt."""
+    """Stand-in for VisionClient: returns canned JSON depending on the prompt."""
 
     async def generate(self, prompt: str, image_bytes: bytes) -> str:
         if "dish_photos" in prompt:

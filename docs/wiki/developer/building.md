@@ -53,7 +53,8 @@ Releases go out via GitHub releases and F-Droid — there is no in-app updater.
 
 ## Server
 
-Requires Python 3.12+ and (for extraction) Ollama on the host with `qwen2.5vl:7b` pulled.
+Requires Python 3.12+ and (for extraction) a vision model — by default Ollama on the host with
+`qwen2.5vl:7b` pulled; see [Self-hosting → Vision model](self-hosting.md#vision-model).
 
 ```bash
 cd server

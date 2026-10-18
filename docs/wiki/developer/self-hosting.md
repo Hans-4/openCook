@@ -11,6 +11,7 @@ network. The recommended deployment is Docker; a plain Python run also works.
   ```bash
   ollama pull qwen2.5vl:7b
   ```
+  That is the default; the model can also run elsewhere — see [Vision model](#vision-model).
 
 ## Docker (recommended)
 
@@ -23,7 +24,7 @@ docker compose logs -f               # "Job worker started", mDNS advertise line
 ```
 
 The container runs **only the server** (FastAPI + SQLite + the job worker + mDNS); it calls the
-host's Ollama over HTTP. `network_mode: host` is used so mDNS reaches the LAN and the container can
+vision model over HTTP — by default the host's Ollama. `network_mode: host` is used so mDNS reaches the LAN and the container can
 reach Ollama at `localhost:11434`. `restart: unless-stopped` brings it back after a reboot.
 
 Hardening (already set in `docker-compose.yml`): non-root user (uid 10001), `read_only` root
@@ -55,12 +56,53 @@ Environment variables, all prefixed `OPENCOOK_` (a `server/.env` file is read to
 | `OPENCOOK_HOST` | `0.0.0.0` | HTTP bind address |
 | `OPENCOOK_PORT` | `8000` | HTTP port |
 | `OPENCOOK_SERVER_NAME` | hostname | Name advertised over mDNS |
-| `OPENCOOK_OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
-| `OPENCOOK_OLLAMA_MODEL` | `qwen2.5vl:7b` | Vision model |
+| `OPENCOOK_VISION_BASE_URL` | `http://localhost:11434/v1` | OpenAI-compatible vision endpoint |
+| `OPENCOOK_VISION_MODEL` | `qwen2.5vl:7b` | Vision model |
+| `OPENCOOK_VISION_API_KEY` | — | Only for endpoints that require a key |
+| `OPENCOOK_VISION_PARAMS` | see [Vision model](#vision-model) | Extra request fields (JSON) |
 | `OPENCOOK_WORKER_POLL_INTERVAL` | `2.0` | Job worker poll interval (s) |
 | `OPENCOOK_BACKUP_DIR` | `<data_dir>/backups` | Backup archive location |
 | `OPENCOOK_BACKUP_KEEP` | `14` | Backups to retain (rotation) |
 | `OPENCOOK_ADMIN_PASSWORD` | — | Sets the admin password on first start (see below) |
+
+### Vision model
+
+Photo scanning talks to the model over the **OpenAI chat-completions API**, which nearly every model
+server speaks. The default is the host's Ollama (`http://localhost:11434/v1`); to use something else,
+change the base URL and model:
+
+| Where the model runs | `OPENCOOK_VISION_BASE_URL` |
+|---|---|
+| Ollama on this machine (default) | `http://localhost:11434/v1` |
+| Ollama on another machine, e.g. a desktop with a GPU | `http://192.168.1.20:11434/v1` |
+| llama.cpp (`llama-server`), LM Studio, vLLM | that server's address, ending in `/v1` |
+| A hosted service | its OpenAI-compatible URL, plus `OPENCOOK_VISION_API_KEY` |
+
+With an API key set, the server refuses to start unless the base URL is `https://` (or loopback,
+which never leaves the machine) — the key would otherwise cross the network unencrypted. Keep the
+key in `server/.env` readable only by you (`chmod 600`), never in git.
+
+`OPENCOOK_VISION_PARAMS` adds fields to every request, as a JSON object. The default is tuned for
+Ollama — near-exact reading and JSON output:
+
+```dotenv
+OPENCOOK_VISION_PARAMS={"temperature": 0.0001, "response_format": {"type": "json_object"}}
+```
+
+Setting it replaces the whole default, so repeat what you want to keep. Not every endpoint accepts
+every field: LM Studio has no `json_object` mode, OpenAI's reasoning models reject a `temperature`,
+and some servers take extras of their own (e.g. llama.cpp's `repeat_penalty`). If scans fail with
+the endpoint rejecting the request, the server log names the field — drop it, or set `{}` to send
+none. A cap such as `"max_tokens": 4000` stops a scan that gets stuck repeating itself after a
+minute instead of running for many.
+
+Only `qwen2.5vl:7b` has been validated against real cookbook pages; other models may read worse. If
+the endpoint is outside your home network, every scanned photo is sent there — the server logs a
+warning at startup when that is the case.
+
+Upgrading from an older server: `OPENCOOK_OLLAMA_BASE_URL` / `OPENCOOK_OLLAMA_MODEL` are no longer
+read. If you had set them, use `OPENCOOK_VISION_BASE_URL` (add `/v1` to the old address) and
+`OPENCOOK_VISION_MODEL` instead.
 
 ## Data
 
@@ -139,4 +181,5 @@ releases. Release steps are in [Building → Releasing](building.md#releasing).
 - Most endpoints are **unauthenticated by design** (trusted LAN/VPN). **Never expose port 8000 to
   the internet.** Admin endpoints are password-protected; households can also set a join PIN.
 - The server reaches no filesystem beyond `/data` (in Docker) and contacts no third party except the
-  host's Ollama.
+  vision endpoint — by default the host's Ollama. If you point it outside your home network, scanned
+  photos go there; the server logs a warning at startup when that is the case.

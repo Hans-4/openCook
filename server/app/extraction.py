@@ -9,7 +9,8 @@ original (full-resolution) photo with Pillow.
 Lessons baked in (see memory/extraction-model.md):
   - qwen returns absolute pixel coords in the SENT image space -> we send a
     controlled size (multiple of 28) so coords map 1:1.
-  - Ollama's hard `format: "json"` 500s on some images -> we parse leniently.
+  - JSON mode is requested but not guaranteed (and once 500'd Ollama on some
+    images) -> we parse leniently.
 """
 
 import difflib
@@ -25,7 +26,7 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-from app.ollama_client import OllamaClient
+from app.vision_client import VisionClient
 
 logger = logging.getLogger(__name__)
 
@@ -198,7 +199,7 @@ def _assign_boxes(recipe_titles: list[str], boxes: list[_Box]) -> dict[int, _Box
 
 
 class RecipeExtractor:
-    def __init__(self, client: OllamaClient, images_dir: Path) -> None:
+    def __init__(self, client: VisionClient, images_dir: Path) -> None:
         self._client = client
         self._images_dir = images_dir
 

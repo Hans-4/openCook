@@ -1,7 +1,7 @@
 """In-process async worker that drains the jobs table.
 
 No external queue (Redis/Celery) — keeps self-hosting to a single process.
-Phase 0 skeleton: it claims pending jobs but the actual Ollama call + cropping
+Phase 0 skeleton: it claims pending jobs but the actual model call + cropping
 are implemented in Phase 1.
 """
 
@@ -16,14 +16,14 @@ from app.config import get_settings
 from app.db import SessionLocal
 from app.extraction import RecipeExtractor
 from app.models import Job, JobStatus
-from app.ollama_client import OllamaClient
+from app.vision_client import VisionClient
 
 logger = logging.getLogger(__name__)
 
 
 async def _process_one(job_id: str) -> None:
     settings = get_settings()
-    extractor = RecipeExtractor(OllamaClient(), settings.images_dir)
+    extractor = RecipeExtractor(VisionClient(), settings.images_dir)
 
     with SessionLocal() as session:
         job = session.get(Job, job_id)
