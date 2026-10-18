@@ -10,7 +10,7 @@ server/app/
   main.py          # FastAPI app, lifespan (init_db, WAL checkpoint, mDNS, worker), router wiring
   config.py        # Settings — OPENCOOK_* env vars
   db.py            # SQLAlchemy engine, SQLite WAL, init_db(), get_session()
-  models.py        # ORM: Household, ServerConfig, SyncMessage, ImportRecord, Job
+  models.py        # ORM: Household, ServerConfig, PromptOverride, SyncMessage, ImportRecord, Job
   schemas.py       # Pydantic request/response DTOs
   extraction.py    # qwen2.5vl pipeline → schema.org/Recipe + cropped photos
   vision_client.py # async OpenAI-compatible client for the vision model (retries/backoff)
@@ -52,10 +52,10 @@ ORM tables (`models.py`):
 
 1. **Orient & resize** — `ImageOps.exif_transpose`, then `_smart_resize` to longest side ≤ 1008 px
    with both dimensions a multiple of 28 (qwen2.5vl's pixel budget; keeps box coords mapping 1:1).
-2. **Text call** — the content-language prompt (`load_i18n(language).text_prompt`) → vision model →
+2. **Text call** — the content-language prompt (`load_i18n(language).text_prompt()`: the language's *instructions* — or the owner's replacement from the admin console — plus its fixed *format*) → vision model →
    `{"recipes": [{title, servings, category, tags, prep_time, cook_time, ingredients[], steps[],
    nutrition, notes}]}` (lenient JSON parse). `category` is a universal key (`pasta/meat/…`).
-3. **Box call** — `box_prompt` → `{"dish_photos": [{recipe_title, box:[x1,y1,x2,y2]}]}` in
+3. **Box call** — `box_prompt()`, built the same way → `{"dish_photos": [{recipe_title, box:[x1,y1,x2,y2]}]}` in
    sent-image pixels (best-effort; failures are non-fatal).
 4. **Assign** — `_assign_boxes` greedily matches each photo to a recipe by title similarity (1:1).
 5. **Crop** — scale box coords back to the original image, crop, save to `images_dir` (JPEG q88).

@@ -14,8 +14,8 @@ from sqlalchemy import select
 
 from app.config import get_settings
 from app.db import SessionLocal
-from app.extraction import RecipeExtractor
-from app.models import Job, JobStatus
+from app.extraction import RecipeExtractor, load_i18n
+from app.models import Job, JobStatus, PromptOverride
 from app.vision_client import VisionClient
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,10 @@ async def _process_one(job_id: str) -> None:
         job = session.get(Job, job_id)
         image_path = job.image_path if job else None
         language = job.language if job else None
+        # The owner's instructions for the catalog this job will actually use, if any.
+        override = session.get(PromptOverride, load_i18n(language).language)
+        text_instructions = override.text_instructions if override else None
+        box_instructions = override.box_instructions if override else None
     if not image_path:
         return
 
@@ -40,7 +44,10 @@ async def _process_one(job_id: str) -> None:
                 session.commit()
 
     try:
-        recipes = await extractor.extract(Path(image_path), on_stage=set_stage, language=language)
+        recipes = await extractor.extract(
+            Path(image_path), on_stage=set_stage, language=language,
+            text_instructions=text_instructions, box_instructions=box_instructions,
+        )
         with SessionLocal() as session:
             job = session.get(Job, job_id)
             job.result_json = json.dumps(recipes, ensure_ascii=False)

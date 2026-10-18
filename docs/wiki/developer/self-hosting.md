@@ -96,7 +96,8 @@ the endpoint rejecting the request, the server log names the field — drop it, 
 none. A cap such as `"max_tokens": 4000` stops a scan that gets stuck repeating itself after a
 minute instead of running for many.
 
-Only `qwen2.5vl:7b` has been validated against real cookbook pages; other models may read worse. If
+Only `qwen2.5vl:7b` has been validated against real cookbook pages; other models may read worse —
+the console's **Prompts** view lets you adapt the instructions to yours. If
 the endpoint is outside your home network, every scanned photo is sent there — the server logs a
 warning at startup when that is the case.
 
@@ -135,6 +136,15 @@ The console offers:
   household, with an added/edited/deleted breakdown and filter. Dish crops and AI original-scan
   photos render inline.
 - **Households** — rename, set/change/clear a PIN, or delete a household.
+- **Prompts** — per recipe language, replace the instructions the vision model gets for reading the
+  recipe text and for finding dish photos (e.g. for another model, or for your own books). Every
+  language is listed with the households that use it — the *Recipe language* they have set, or for a
+  household following its phones' language, the language of its recent scans — the ones in use
+  first. Before any household exists, English (the default) counts as in use. The output
+  format is always appended by the server and shown read-only, so an edit can't break scanning.
+  Applies from the next scan; *Reset to default* (or saving the default text unchanged) returns to the
+  built-in instructions, which keeps future improvements to them. Stored in the database, so it is
+  part of server backups and survives updates and a full reset.
 - **Maintenance** — create/download/restore backups, change the admin password, full reset.
 
 The page itself is unauthenticated (it carries no data) and prompts for the password, which it sends
