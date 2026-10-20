@@ -103,20 +103,32 @@
     <string name="recipe_cooked_today">اليوم</string>
     <string name="recipe_cooked_yesterday">أمس</string>
     <plurals name="recipe_cooked_days_ago">
+        <item quantity="zero">قبل %1$d يوم</item>
         <item quantity="one">قبل %1$d يوم</item>
-        <item quantity="other">قبل %1$d أيام</item>
+        <item quantity="two">قبل يومين</item>
+        <item quantity="few">قبل %1$d أيام</item>
+        <item quantity="many">قبل %1$d يومًا</item>
+        <item quantity="other">قبل %1$d يوم</item>
     </plurals>
     <string name="recipe_cooked_week_ago">قبل أسبوع</string>
     <plurals name="recipe_cooked_weeks_ago">
+        <item quantity="zero">قبل %1$d أسبوع</item>
         <item quantity="one">قبل %1$d أسبوع</item>
-        <item quantity="other">قبل %1$d أسابيع</item>
+        <item quantity="two">قبل أسبوعين</item>
+        <item quantity="few">قبل %1$d أسابيع</item>
+        <item quantity="many">قبل %1$d أسبوعًا</item>
+        <item quantity="other">قبل %1$d أسبوع</item>
     </plurals>
     <string name="recipe_liked_label">♥ أعجبني</string>
     <string name="recipe_cook_moved">نُقلت “%1$s” إلى %2$s</string>
     <string name="recipe_cook_removed">أُزيلت “%1$s” من اليوم</string>
     <plurals name="recipe_cooked_times">
+        <item quantity="zero">طُهيت %1$d مرة</item>
         <item quantity="one">طُهيت %1$d مرة</item>
-        <item quantity="other">طُهيت %1$d مرات</item>
+        <item quantity="two">طُهيت مرتين</item>
+        <item quantity="few">طُهيت %1$d مرات</item>
+        <item quantity="many">طُهيت %1$d مرة</item>
+        <item quantity="other">طُهيت %1$d مرة</item>
     </plurals>
     <string name="recipe_cooked_last_short">آخر مرة %1$s</string>
 
@@ -124,12 +136,20 @@
     <string name="retrospect_title">نظرة إلى الماضي</string>
     <string name="retrospect_entry_title">ما طهيناه</string>
     <plurals name="retrospect_entry_subtitle">
+        <item quantity="zero">%1$s: %2$d وجبة</item>
         <item quantity="one">%1$s: %2$d وجبة</item>
-        <item quantity="other">%1$s: %2$d وجبات</item>
+        <item quantity="two">%1$s: وجبتان</item>
+        <item quantity="few">%1$s: %2$d وجبات</item>
+        <item quantity="many">%1$s: %2$d وجبة</item>
+        <item quantity="other">%1$s: %2$d وجبة</item>
     </plurals>
     <plurals name="retrospect_month_meals">
+        <item quantity="zero">%1$d وجبة مطهيّة</item>
         <item quantity="one">%1$d وجبة مطهيّة</item>
-        <item quantity="other">%1$d وجبات مطهيّة</item>
+        <item quantity="two">وجبتان مطهيّتان</item>
+        <item quantity="few">%1$d وجبات مطهيّة</item>
+        <item quantity="many">%1$d وجبة مطهيّة</item>
+        <item quantity="other">%1$d وجبة مطهيّة</item>
     </plurals>
     <string name="retrospect_empty_title">لا شيء لاستعراضه بعد</string>
     <string name="retrospect_empty_message">عندما تحدد الوجبات كمطهيّة، تتجمع هنا.</string>
@@ -156,7 +176,11 @@
     <string name="status_stage_with_queue">%1$s · %2$d في الانتظار</string>
     <string name="status_queued_only">%1$d في الانتظار…</string>
     <plurals name="status_failed">
+        <item quantity="zero">فشل %1$d من عمليات المسح</item>
         <item quantity="one">فشل مسح واحد</item>
+        <item quantity="two">فشل مسحان</item>
+        <item quantity="few">فشل %1$d من عمليات المسح</item>
+        <item quantity="many">فشل %1$d من عمليات المسح</item>
         <item quantity="other">فشل %1$d من عمليات المسح</item>
     </plurals>
     <string name="status_added_one">تمت إضافة “%1$s”</string>
@@ -349,12 +373,20 @@
 
     <!-- Browser-inbox import (recipes pushed by the extension, drained during sync) -->
     <plurals name="import_browser_imported">
+        <item quantity="zero">تم استيراد %1$d وصفة من المتصفح</item>
         <item quantity="one">تم استيراد وصفة واحدة من المتصفح</item>
-        <item quantity="other">تم استيراد %1$d وصفات من المتصفح</item>
+        <item quantity="two">تم استيراد وصفتين من المتصفح</item>
+        <item quantity="few">تم استيراد %1$d وصفات من المتصفح</item>
+        <item quantity="many">تم استيراد %1$d وصفة من المتصفح</item>
+        <item quantity="other">تم استيراد %1$d وصفة من المتصفح</item>
     </plurals>
     <plurals name="import_browser_skipped">
+        <item quantity="zero">تم تخطي %1$d تكرار</item>
         <item quantity="one">تم تخطي تكرار واحد</item>
-        <item quantity="other">تم تخطي %1$d تكرارات</item>
+        <item quantity="two">تم تخطي تكرارين</item>
+        <item quantity="few">تم تخطي %1$d تكرارات</item>
+        <item quantity="many">تم تخطي %1$d تكرارًا</item>
+        <item quantity="other">تم تخطي %1$d تكرار</item>
     </plurals>
 
     <!-- Share import (Share → openCook): a recipe page URL shared from a browser -->
@@ -402,23 +434,39 @@
     <string name="recipes_selection_cancel">إلغاء التحديد</string>
     <string name="recipes_select_none">إلغاء تحديد الكل</string>
     <plurals name="recipes_bulk_edit_title">
+        <item quantity="zero">تعديل %1$d وصفة</item>
         <item quantity="one">تعديل %1$d وصفة</item>
-        <item quantity="other">تعديل %1$d وصفات</item>
+        <item quantity="two">تعديل وصفتين</item>
+        <item quantity="few">تعديل %1$d وصفات</item>
+        <item quantity="many">تعديل %1$d وصفة</item>
+        <item quantity="other">تعديل %1$d وصفة</item>
     </plurals>
     <string name="recipes_bulk_apply">تطبيق</string>
     <string name="recipes_bulk_mixed">متنوعة</string>
     <string name="recipes_bulk_no_cookbook">بدون كتاب طبخ</string>
     <string name="recipes_bulk_mealtypes_hint">اضغط على وجبة لمنحها لجميع الوصفات، أو لعدم منحها لأي منها.</string>
     <plurals name="recipes_bulk_done">
+        <item quantity="zero">تم تحديث %1$d وصفة</item>
         <item quantity="one">تم تحديث %1$d وصفة</item>
-        <item quantity="other">تم تحديث %1$d وصفات</item>
+        <item quantity="two">تم تحديث وصفتين</item>
+        <item quantity="few">تم تحديث %1$d وصفات</item>
+        <item quantity="many">تم تحديث %1$d وصفة</item>
+        <item quantity="other">تم تحديث %1$d وصفة</item>
     </plurals>
     <plurals name="recipes_delete_selected_title">
+        <item quantity="zero">حذف %1$d وصفة؟</item>
         <item quantity="one">حذف %1$d وصفة؟</item>
-        <item quantity="other">حذف %1$d وصفات؟</item>
+        <item quantity="two">حذف وصفتين؟</item>
+        <item quantity="few">حذف %1$d وصفات؟</item>
+        <item quantity="many">حذف %1$d وصفة؟</item>
+        <item quantity="other">حذف %1$d وصفة؟</item>
     </plurals>
     <plurals name="recipes_delete_selected_text">
+        <item quantity="zero">سيتم حذف هذه الوصفات نهائيًا.</item>
         <item quantity="one">سيتم حذف هذه الوصفة نهائيًا.</item>
+        <item quantity="two">سيتم حذف هاتين الوصفتين نهائيًا.</item>
+        <item quantity="few">سيتم حذف هذه الوصفات نهائيًا.</item>
+        <item quantity="many">سيتم حذف هذه الوصفات نهائيًا.</item>
         <item quantity="other">سيتم حذف هذه الوصفات نهائيًا.</item>
     </plurals>
     <string name="settings_leave_confirm_title">مغادرة الأسرة؟</string>

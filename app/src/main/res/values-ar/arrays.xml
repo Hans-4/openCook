@@ -93,7 +93,7 @@
     <!-- Recognized measuring units (kept verbatim; never converted). Metric is universal. -->
     <string-array name="ingredient_units">
         <item>g</item><item>kg</item><item>mg</item><item>l</item><item>ml</item><item>cl</item><item>dl</item>
-        <item>لتر</item><item>ليتر</item><item>غرام</item><item>كيلوغرام</item>
+        <item>لتر</item><item>ليتر</item><item>ل</item><item>غرام</item><item>كيلوغرام</item><item>غ</item><item>كغ</item><item>جرام</item><item>جم</item><item>مل</item>
         <item>كوب</item><item>أكواب</item><item>"ملعقة كبيرة"</item><item>"ملاعق كبيرة"</item><item>"ملعقة طعام"</item><item>"ملاعق طعام"</item>
         <item>"ملعقة صغيرة"</item><item>"ملاعق صغيرة"</item><item>"ملعقة شاي"</item><item>"ملاعق شاي"</item><item>أونصة</item><item>رطل</item>
         <item>أرطال</item><item>باوند</item><item>باوندات</item><item>فص</item><item>فصوص</item><item>رشة</item>
@@ -132,19 +132,19 @@
          The keys themselves ("pasta", "meat", …) always match and need no entry here; add only
          the words your language uses when a recipe was imported or written by hand. -->
     <string-array name="cat_alias_pasta">
-        <item>نودلز</item><item>مكرونة</item>
+        <item>نودلز</item><item>مكرونة</item><item>معكرونة</item><item>باستا</item>
     </string-array>
     <string-array name="cat_alias_meat">
-        <item>لحوم</item><item>دواجن</item>
+        <item>لحم</item><item>لحوم</item><item>دواجن</item>
     </string-array>
     <string-array name="cat_alias_fish">
-        <item>"مأكولات بحرية"</item>
+        <item>سمك</item><item>أسماك</item><item>"مأكولات بحرية"</item>
     </string-array>
     <string-array name="cat_alias_soup">
-        <item>حساء</item><item>يخنة</item>
+        <item>شوربة</item><item>حساء</item><item>يخنة</item>
     </string-array>
     <string-array name="cat_alias_vegetarian">
-        <item>خضار</item><item>فيغان</item>
+        <item>نباتي</item><item>خضار</item><item>فيغان</item>
     </string-array>
     <string-array name="cat_alias_salad">
         <item>سلطة</item>
@@ -159,16 +159,16 @@
     <!-- Legacy/import meal words → the fixed meal-type keys (exact match, lower-case).
          The keys themselves ("breakfast", "lunch", "snack", "dinner") need no entry. -->
     <string-array name="mealtype_alias_breakfast">
-        <item>صباح</item><item>برانش</item>
+        <item>فطور</item><item>إفطار</item><item>افطار</item><item>صباح</item><item>برانش</item>
     </string-array>
     <string-array name="mealtype_alias_lunch">
-        <item>ظهر</item><item>"منتصف النهار"</item>
+        <item>غداء</item><item>غدا</item><item>ظهر</item><item>"منتصف النهار"</item>
     </string-array>
     <string-array name="mealtype_alias_snack">
-        <item>كيك</item><item>قهوة</item><item>"وقت الشاي"</item>
+        <item>كيك</item><item>قهوة</item><item>"وقت الشاي"</item><item>"وجبة خفيفة"</item><item>سناك</item><item>تصبيرة</item>
     </string-array>
     <string-array name="mealtype_alias_dinner">
-        <item>"وجبة مسائية"</item><item>مساء</item>
+        <item>عشاء</item><item>عشا</item><item>"وجبة مسائية"</item><item>مساء</item>
     </string-array>
 
     <!-- Language mechanics for ingredient matching. All four are optional: leave a list out and
@@ -181,6 +181,7 @@
         <item>"قليل من"</item><item>"القليل من"</item><item>بضع</item><item>"رشة من"</item>
         <item>"حفنة من"</item><item>حوالي</item><item>تقريبًا</item><item>نحو</item><item>بعض</item>
         <item>g</item><item>kg</item><item>mg</item><item>ml</item><item>cl</item><item>l</item>
+        <item>غ</item><item>كغ</item><item>مل</item><item>جرام</item><item>جم</item>
         <item>أونصة</item><item>رطل</item><item>أرطال</item><item>"ملعقة كبيرة"</item><item>"ملعقة صغيرة"</item>
         <item>كوب</item><item>أكواب</item><item>علبة</item><item>علب</item><item>برطمان</item>
         <item>عبوة</item><item>باكيت</item><item>شريحة</item><item>شرائح</item>
@@ -229,23 +230,9 @@
         <item>دقيق الأرز|دقيق</item>
     </string-array>
 
-    <!-- Starting points for the in-app browser, for households cooking in this language.
-         Plain links: tapping one opens that site's own recipe section, the user browses and
-         picks. Keep every entry answering 200, and prefer sites that publish schema.org
-         JSON-LD (that is what the import reads). Leave the array out and the English board
-         is used. -->
-    <string-array name="discover_sites">
-        <item>https://www.allrecipes.com/recipes/</item>
-        <item>https://www.bbc.co.uk/food/recipes</item>
-        <item>https://www.seriouseats.com/all-recipes-5117985</item>
-        <item>https://www.simplyrecipes.com/</item>
-        <item>https://www.epicurious.com/recipes-menus</item>
-        <item>https://www.delish.com/cooking/recipe-ideas/</item>
-        <item>https://www.jamieoliver.com/recipes/</item>
-        <item>https://www.budgetbytes.com/category/recipes/</item>
-        <item>https://www.tasteofhome.com/recipes/</item>
-        <item>https://www.recipetineats.com/recipes/</item>
-    </string-array>
+    <!-- discover_sites is intentionally omitted: the default (English) board lists only English-language
+         recipe sites, so a copy here added nothing for Arabic households. With the array absent the
+         default list is used (see the note in values/arrays.xml). -->
 
     <!-- How a site spells its own name: "domain label|display name". Only needed where simple
          capitalization gets it wrong ("bbcgoodfood" would read "Bbcgoodfood"). Names the
