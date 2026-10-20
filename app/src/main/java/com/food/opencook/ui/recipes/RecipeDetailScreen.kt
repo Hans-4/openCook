@@ -140,6 +140,9 @@ import com.food.opencook.util.DurationFormat
 import com.food.opencook.util.Numbers
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import com.food.opencook.util.SourceLink
+import androidx.compose.material.icons.outlined.Link
+import androidx.compose.ui.platform.LocalUriHandler
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -756,8 +759,8 @@ private fun LimitedChips(
 }
 
 /**
- * Meta line under the title: servings (with a people icon), then the source cookbook,
- * then prep/cook times. Wraps to a second line on narrow screens.
+ * Meta line under the title: servings (with a people icon), then the source cookbook and
+ * the page it came from, then prep/cook times. Wraps to a second line on narrow screens.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -776,6 +779,7 @@ private fun RecipeMeta(data: RecipeWithDetails, cookedCount: Int = 0) {
     ) {
         servings?.let { MetaItem(Icons.Outlined.Group, it) }
         r.cookbook?.takeIf { it.isNotBlank() }?.let { MetaItem(Icons.AutoMirrored.Outlined.MenuBook, it) }
+        r.sourceUrl?.let { url -> SourceLink.host(url)?.let { SourceLinkItem(url, it) } }
         times?.let { MetaItem(Icons.Outlined.Schedule, it) }
         r.lastCookedAt?.let { lastCookedLabel(it) }?.let { recency ->
             // With a history behind it the count leads and the date becomes the qualifier —
@@ -815,6 +819,22 @@ private fun MetaItem(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** The page an imported recipe came from, as its site name ("chefkoch.de"); opens it. */
+@Composable
+private fun SourceLinkItem(url: String, host: String) {
+    val uriHandler = LocalUriHandler.current
+    Row(
+        Modifier.clickable(onClickLabel = stringResource(R.string.recipe_open_source)) {
+            runCatching { uriHandler.openUri(url) }
+        },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Icon(Icons.Outlined.Link, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+        Text(host, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
     }
 }
 

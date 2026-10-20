@@ -143,8 +143,10 @@ server/app/i18n/en.json                  →  server/app/i18n/fr.json
 
 | key | what to do |
 |---|---|
-| `text_prompt` | translate the extraction instructions (**carefully** — it's engineering text; a wrong instruction can hurt extraction quality) |
-| `box_prompt` | translate the dish-photo prompt |
+| `text_instructions` | translate the extraction instructions (**carefully** — it's engineering text; a wrong instruction can hurt extraction quality) |
+| `text_format` | translate the sentences around the JSON, but keep the JSON skeleton and its keys exactly as they are — the parser relies on them |
+| `box_instructions` | translate the dish-photo instructions |
+| `box_format` | same as `text_format`: translate the prose, keep the JSON and the `x1, y1, x2, y2` coordinate rule |
 | `duration_hours` / `duration_minutes` | the words that mark hours/minutes (`heure`, `min`, …) |
 | `units` | units in your language |
 | `category_aliases` | map your language's category words to the universal keys, e.g. `{"viande": "meat", "poisson": "fish"}` |
@@ -220,5 +222,5 @@ editing files. You'd add **two components** to a Weblate project pointing at thi
 | App UI + arrays | Android String Resource | `app/src/main/res/values-*/strings.xml` and `…/arrays.xml` | `values/` |
 | Server extraction | JSON file | `server/app/i18n/*.json` | `en.json` |
 
-Gate the server `text_prompt` behind review (it's engineering, not UI copy). Until then, the manual
+Gate the server `text_instructions` and `*_format` behind review (they're engineering, not UI copy). Until then, the manual
 file-editing process above is all you need.

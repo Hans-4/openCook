@@ -23,12 +23,14 @@ import com.food.opencook.data.remote.dto.IngredientDto
 import com.food.opencook.data.remote.dto.NutritionDto
 import com.food.opencook.data.remote.dto.RecipeDto
 import com.food.opencook.util.RecipeCategories
+import com.food.opencook.util.SourceLink
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 /**
  * Parses imported recipe JSON into [RecipeDto]s (which the existing mapper turns into
@@ -128,6 +130,7 @@ object RecipeImportParser {
             totalTime = obj.firstString("totalTime")?.takeIf { it.startsWith("PT") },
             nutrition = extractNutrition(obj),
             cookbook = extractCookbook(obj),
+            url = extractPageUrl(obj),
             openCookLastCookedAt = obj.firstString("openCookLastCookedAt"),
             openCookCreatedAt = obj.firstString("openCookCreatedAt")?.toLongOrNull(),
             openCookUpdatedAt = obj.firstString("openCookUpdatedAt")?.toLongOrNull(),
@@ -154,6 +157,18 @@ object RecipeImportParser {
 
     private fun extractStringList(obj: JsonObject, key: String): List<String> =
         (obj[key] as? JsonArray)?.mapNotNull { it.str()?.trim() }?.filter { it.isNotEmpty() }.orEmpty()
+
+    /** The recipe's own page: schema.org `url`, else `mainEntityOfPage` (a URL or a
+     *  WebPage with an `@id`/`url`). Only http(s) — anything else is no link to open. */
+    private fun extractPageUrl(obj: JsonObject): String? {
+        val page = obj["mainEntityOfPage"]
+        val candidates = listOfNotNull(
+            obj.firstString("url"),
+            (page as? JsonPrimitive)?.contentOrNull,
+            (page as? JsonObject)?.let { it.firstString("@id") ?: it.firstString("url") },
+        )
+        return candidates.map { it.trim() }.firstOrNull { SourceLink.isWebUrl(it) }
+    }
 
     /** Source cookbook from schema.org `isPartOf` (a Book/CreativeWork) — its `name`,
      *  or a bare string. schema.org/Recipe has no dedicated cookbook property, so this

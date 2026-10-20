@@ -193,6 +193,9 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+    // Drag-to-reorder in the recipe editor
+    implementation(libs.reorderable)
+
     // Camera capture
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

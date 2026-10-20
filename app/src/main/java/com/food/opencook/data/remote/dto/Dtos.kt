@@ -211,6 +211,8 @@ data class RecipeDto(
     val nutrition: NutritionDto? = null,
     /** Source cookbook name (openCook extension; schema.org/Recipe has no such property). */
     val cookbook: String? = null,
+    /** The page the recipe lives on — schema.org `url` (inherited from Thing). */
+    val url: String? = null,
     /** ISO date this recipe was last cooked (openCook extension; backup round-trip). */
     val openCookLastCookedAt: String? = null,
     /** Epoch millis of creation/last edit (openCook extension; backup round-trip). */

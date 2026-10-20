@@ -22,7 +22,7 @@ from app.extraction import (
 
 
 class FakeClient:
-    """Stand-in for OllamaClient: returns canned JSON depending on the prompt."""
+    """Stand-in for VisionClient: returns canned JSON depending on the prompt."""
 
     async def generate(self, prompt: str, image_bytes: bytes) -> str:
         if "dish_photos" in prompt:
@@ -67,11 +67,13 @@ def test_normalize_meal_types():
 def test_load_i18n_unknown_language_falls_back_to_english():
     en = load_i18n("en")
     ja = load_i18n("ja")  # no ja.json yet → English catalog
-    assert ja.text_prompt == en.text_prompt
+    assert ja.language == "en"
+    assert ja.text_prompt() == en.text_prompt()
     assert ja.units == en.units
     # German is its own catalog; merged units are a superset of English.
     de = load_i18n("de")
-    assert de.text_prompt != en.text_prompt
+    assert de.language == "de"
+    assert de.text_prompt() != en.text_prompt()
     assert en.units <= de.units
 
 
@@ -276,3 +278,34 @@ def test_extractor_end_to_end(tmp_path):
     # A dish crop was matched, written to disk and referenced on the recipe.
     assert recipes[0]["image"]
     assert (images_dir / recipes[0]["image"][0]).exists()
+
+
+def test_every_prompt_is_instructions_then_the_fixed_format():
+    """The format part carries the JSON the parser relies on; the instructions (the part
+    a server owner may replace) must not, or a replacement could drop it."""
+    for path in sorted(_I18N_DIR.glob("*.json")):
+        i18n = load_i18n(path.stem)
+        assert i18n.text_prompt() == f"{i18n.text_instructions}\n\n{i18n.text_format}"
+        assert '{"recipes"' in i18n.text_format and '{"recipes"' not in i18n.text_instructions
+        assert '{"dish_photos"' in i18n.box_format and '{"dish_photos"' not in i18n.box_instructions
+
+
+def test_custom_instructions_replace_only_the_instructions(tmp_path):
+    image = tmp_path / "page.jpg"
+    Image.new("RGB", (200, 150), (210, 210, 210)).save(image)
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    prompts: list[str] = []
+
+    class RecordingClient(FakeClient):
+        async def generate(self, prompt: str, image_bytes: bytes) -> str:
+            prompts.append(prompt)
+            return await super().generate(prompt, image_bytes)
+
+    recipes = asyncio.run(RecipeExtractor(RecordingClient(), images_dir).extract(
+        image, language="de", text_instructions="Lies nur fett Gedrucktes.",
+        box_instructions="Nur Fotos rechts.",
+    ))
+    de = load_i18n("de")
+    assert prompts == [f"Lies nur fett Gedrucktes.\n\n{de.text_format}", f"Nur Fotos rechts.\n\n{de.box_format}"]
+    assert recipes[0]["name"] == "Test Rezept"  # still parsed: the format part is intact

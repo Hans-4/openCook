@@ -9,8 +9,13 @@ services:
     network_mode: host
     environment:
       OPENCOOK_DATA_DIR: /data
-      OPENCOOK_OLLAMA_BASE_URL: http://localhost:11434
-      OPENCOOK_OLLAMA_MODEL: qwen2.5vl:7b
+      # Vision model over the OpenAI chat API: the host's Ollama by default, or any other
+      # compatible server (see self-hosting.md). The key is only for endpoints needing one.
+      OPENCOOK_VISION_BASE_URL: ${OPENCOOK_VISION_BASE_URL:-http://localhost:11434/v1}
+      OPENCOOK_VISION_MODEL: ${OPENCOOK_VISION_MODEL:-qwen2.5vl:7b}
+      OPENCOOK_VISION_API_KEY: ${OPENCOOK_VISION_API_KEY:-}
+      # Extra request fields as JSON; replaces the Ollama-tuned default (see self-hosting.md):
+      # OPENCOOK_VISION_PARAMS: '{"temperature": 0.0001, "response_format": {"type": "json_object"}}'
       OPENCOOK_SERVER_NAME: ${OPENCOOK_SERVER_NAME:-openCook}
       # OPENCOOK_BACKUP_DIR: /backups   # uncomment to store backups OUTSIDE the data volume
     volumes:

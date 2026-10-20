@@ -83,9 +83,10 @@ Android Studio).
 
 ### Server (optional)
 
-Needed only for reading recipes from photos and family sync. Requires Python 3.12+ and
+Needed only for reading recipes from photos and family sync. Requires Python 3.12+ and, by default,
 [Ollama](https://ollama.com) running on the same machine with the vision model pulled
-(`ollama pull qwen2.5vl:7b`).
+(`ollama pull qwen2.5vl:7b`) — the model can also run elsewhere, see
+[Self-hosting](docs/wiki/developer/self-hosting.md#vision-model).
 
 ```bash
 cd server

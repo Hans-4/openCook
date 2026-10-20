@@ -35,6 +35,7 @@ import com.food.opencook.ui.navigation.Routes
 import com.food.opencook.util.IngredientMatch
 import com.food.opencook.util.MealTypes
 import com.food.opencook.util.PlanWindow
+import com.food.opencook.util.Numbers
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,10 +90,14 @@ class RecipeDetailViewModel @Inject constructor(
      *
      * Reports whether anything actually landed there: the add is a no-op while the dish's
      * ingredients are still on the list, and saying "added" regardless left the user staring
-     * at a success message and an unchanged list (issue #9).
+     * at a success message and an unchanged list (issue #9). The amounts follow the
+     * servings stepper, as the ingredient list on screen does (GitHub #31).
      */
     fun addToShoppingList(onDone: (added: Boolean) -> Unit) = viewModelScope.launch {
-        val added = recipe.value?.let { shoppingRepository.addFromRecipe(it) } != null
+        val added = recipe.value?.let { r ->
+            val scale = _targetServings.value?.let { Numbers.scaleFor(r.recipe.servings, it) } ?: 1.0
+            shoppingRepository.addFromRecipe(r, scale = scale)
+        } != null
         onDone(added)
     }
 

@@ -66,6 +66,16 @@
     <string name="review_notes">Notes</string>
     <string name="review_add_ingredient">Add ingredient</string>
     <string name="review_add_step">Add step</string>
+    <string name="review_paste_hint_ingredient">Ingredient — or paste a whole list</string>
+    <string name="review_paste_hint_step">Describe the step — or paste all steps</string>
+    <plurals name="review_pasted_ingredients">
+        <item quantity="one">Split into %1$d ingredient</item>
+        <item quantity="other">Split into %1$d ingredients</item>
+    </plurals>
+    <plurals name="review_pasted_steps">
+        <item quantity="one">Split into %1$d step</item>
+        <item quantity="other">Split into %1$d steps</item>
+    </plurals>
     <string name="review_save">Save</string>
     <string name="review_image_take">Take photo</string>
     <string name="review_image_gallery">Gallery</string>
@@ -188,6 +198,7 @@
     <string name="shopping_nf_adapt">Mark as done</string>
     <string name="shopping_adapted">Marked as done</string>
     <string name="scan_manual">Create manually</string>
+    <string name="recipe_open_source">Open original recipe</string>
     <string name="recipe_add_to_plan">Add to week plan</string>
     <string name="recipe_plan_sheet_title">Choose a day</string>
     <string name="recipe_plan_added">Added for %1$s</string>
@@ -232,6 +243,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Add pantry item…</string>
     <string name="pantry_empty">No pantry items yet.</string>
+    <string name="pantry_basics">Basics (always in stock)</string>
+    <string name="pantry_basics_show">Show basics</string>
+    <string name="pantry_basics_hide">Hide basics</string>
+    <string name="pantry_basics_empty">Drag an item here so cooking never uses it up</string>
+    <string name="pantry_moved_to_basics">%1$s → basics</string>
+    <string name="pantry_moved_from_basics">%1$s → regular stock</string>
     <string name="shopping_added">Added to shopping list</string>
 
     <!-- Meal plan -->
@@ -539,6 +556,7 @@
     <string name="lang_german">Deutsch</string>
     <string name="lang_english">English</string>
     <string name="lang_french">Français</string>
+    <string name="lang_spanish">Español</string>
     <string name="lang_arabic">العربية</string>
 
     <!-- Recipe categories (stored as keys, shown localized) -->

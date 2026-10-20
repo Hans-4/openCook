@@ -9,7 +9,8 @@ original (full-resolution) photo with Pillow.
 Lessons baked in (see memory/extraction-model.md):
   - qwen returns absolute pixel coords in the SENT image space -> we send a
     controlled size (multiple of 28) so coords map 1:1.
-  - Ollama's hard `format: "json"` 500s on some images -> we parse leniently.
+  - JSON mode is requested but not guaranteed (and once 500'd Ollama on some
+    images) -> we parse leniently.
 """
 
 import difflib
@@ -25,7 +26,7 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-from app.ollama_client import OllamaClient
+from app.vision_client import VisionClient
 
 logger = logging.getLogger(__name__)
 
@@ -44,15 +45,37 @@ _I18N_DIR = Path(__file__).parent / "i18n"
 
 @dataclass(frozen=True)
 class I18n:
-    """Localized extraction resources for one content language (see app/i18n/*.json)."""
+    """Localized extraction resources for one content language (see app/i18n/*.json).
 
-    text_prompt: str
-    box_prompt: str
+    Each prompt is two parts: *instructions* (how to read the page) and *format* (the
+    JSON the parser relies on). A server owner may replace the instructions from the
+    admin console; the format is always appended as built, so an edited prompt can't
+    break parsing — and format fixes still reach a server with custom instructions.
+    """
+
+    language: str  # the catalog actually loaded ("en" when the language has none)
+    text_instructions: str
+    text_format: str
+    box_instructions: str
+    box_format: str
     duration_hours: tuple[str, ...]
     duration_minutes: tuple[str, ...]
     units: frozenset[str]
     category_aliases: dict[str, str]
     meal_type_aliases: dict[str, str]
+
+    def text_prompt(self, instructions: str | None = None) -> str:
+        """The recipe-text prompt; [instructions] replaces the built-in ones if given."""
+        return f"{instructions or self.text_instructions}\n\n{self.text_format}"
+
+    def box_prompt(self, instructions: str | None = None) -> str:
+        """The dish-photo prompt; [instructions] replaces the built-in ones if given."""
+        return f"{instructions or self.box_instructions}\n\n{self.box_format}"
+
+
+def catalog_languages() -> list[str]:
+    """Every content language with its own catalog in app/i18n/."""
+    return sorted(p.stem for p in _I18N_DIR.glob("*.json"))
 
 
 def _read_catalog(lang: str) -> dict:
@@ -67,6 +90,8 @@ def load_i18n(language: str | None) -> I18n:
     """Load extraction resources for ``language`` (e.g. "de"/"en"); unknown → English.
     Units/durations/aliases are unioned with English so universal tokens always match."""
     lang = (language or "en").strip().lower()[:2]
+    if not (_I18N_DIR / f"{lang}.json").is_file():
+        lang = "en"
     base = _read_catalog("en")
     data = base if lang == "en" else _read_catalog(lang)
 
@@ -74,8 +99,11 @@ def load_i18n(language: str | None) -> I18n:
         return list(dict.fromkeys([*base.get(key, []), *data.get(key, [])]))
 
     return I18n(
-        text_prompt=data.get("text_prompt") or base["text_prompt"],
-        box_prompt=data.get("box_prompt") or base["box_prompt"],
+        language=lang,
+        text_instructions=data.get("text_instructions") or base["text_instructions"],
+        text_format=data.get("text_format") or base["text_format"],
+        box_instructions=data.get("box_instructions") or base["box_instructions"],
+        box_format=data.get("box_format") or base["box_format"],
         duration_hours=tuple(merged("duration_hours")),
         duration_minutes=tuple(merged("duration_minutes")),
         units=frozenset(u.lower() for u in merged("units")),
@@ -198,7 +226,7 @@ def _assign_boxes(recipe_titles: list[str], boxes: list[_Box]) -> dict[int, _Box
 
 
 class RecipeExtractor:
-    def __init__(self, client: OllamaClient, images_dir: Path) -> None:
+    def __init__(self, client: VisionClient, images_dir: Path) -> None:
         self._client = client
         self._images_dir = images_dir
 
@@ -207,10 +235,13 @@ class RecipeExtractor:
         image_path: Path,
         on_stage: Callable[[str], None] | None = None,
         language: str | None = None,
+        text_instructions: str | None = None,
+        box_instructions: str | None = None,
     ) -> list[dict]:
         """Extract recipes. ``on_stage`` (if given) is called with a coarse stage
         key before each model call, so callers can surface progress. ``language``
-        (e.g. "de"/"en") selects the extraction prompt."""
+        (e.g. "de"/"en") selects the extraction prompt; ``text_instructions`` /
+        ``box_instructions`` replace its built-in instructions (see [I18n])."""
         def stage(name: str) -> None:
             if on_stage is not None:
                 on_stage(name)
@@ -225,13 +256,13 @@ class RecipeExtractor:
 
         i18n = load_i18n(language)
         stage("reading_text")
-        text_raw = await self._client.generate(i18n.text_prompt, sent_bytes)
+        text_raw = await self._client.generate(i18n.text_prompt(text_instructions), sent_bytes)
         recipes = parse_json_lenient(text_raw).get("recipes", [])
 
         boxes: list[_Box] = []
         try:
             stage("detecting_photos")
-            box_raw = await self._client.generate(i18n.box_prompt, sent_bytes)
+            box_raw = await self._client.generate(i18n.box_prompt(box_instructions), sent_bytes)
             boxes = _parse_boxes(box_raw, sent.size)
         except Exception:  # noqa: BLE001 - cropping is best-effort, never fatal
             logger.warning("Dish-photo detection failed; recipes saved without images.")

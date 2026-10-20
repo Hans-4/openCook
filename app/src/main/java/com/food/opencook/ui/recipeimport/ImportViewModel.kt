@@ -150,7 +150,7 @@ class ImportViewModel @Inject constructor(
         // real cookbook via schema.org isPartOf — that always wins.
         val cookbook = parsed.dto.cookbook?.takeIf { it.isNotBlank() }
             ?: SourceCookbook.fromUrl(pageUrl)
-        val imp = parsed.copy(dto = parsed.dto.copy(cookbook = cookbook))
+        val imp = parsed.copy(dto = parsed.dto.copy(cookbook = cookbook, url = parsed.dto.url ?: pageUrl))
         val info = saveOne(imp, System.currentTimeMillis())
         return when (info.result) {
             SaveResult.Saved -> ShareImportState.Saved(info.name, info.recipeId)

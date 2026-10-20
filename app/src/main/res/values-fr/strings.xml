@@ -66,6 +66,18 @@
     <string name="review_notes">Notes</string>
     <string name="review_add_ingredient">Ajouter un ingrédient</string>
     <string name="review_add_step">Ajouter une étape</string>
+    <string name="review_paste_hint_ingredient">Ingrédient — ou collez toute une liste</string>
+    <string name="review_paste_hint_step">Décrivez l’étape — ou collez toutes les étapes</string>
+    <plurals name="review_pasted_ingredients">
+        <item quantity="one">Réparti en %1$d ingrédient</item>
+        <item quantity="many">Réparti en %1$d ingrédients</item>
+        <item quantity="other">Réparti en %1$d ingrédients</item>
+    </plurals>
+    <plurals name="review_pasted_steps">
+        <item quantity="one">Réparti en %1$d étape</item>
+        <item quantity="many">Réparti en %1$d étapes</item>
+        <item quantity="other">Réparti en %1$d étapes</item>
+    </plurals>
     <string name="review_save">Enregistrer</string>
     <string name="review_image_take">Prendre une photo</string>
     <string name="review_image_gallery">Galerie</string>
@@ -194,6 +206,7 @@
     <string name="shopping_nf_adapt">Marquer comme fait</string>
     <string name="shopping_adapted">Marqué comme fait</string>
     <string name="scan_manual">Créer manuellement</string>
+    <string name="recipe_open_source">Ouvrir la recette d’origine</string>
     <string name="recipe_add_to_plan">Ajouter au planning</string>
     <string name="recipe_plan_sheet_title">Choisir un jour</string>
     <string name="recipe_plan_added">Ajouté pour %1$s</string>
@@ -238,6 +251,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">Ajouter au garde-manger…</string>
     <string name="pantry_empty">Aucun élément dans le garde-manger.</string>
+    <string name="pantry_basics">Produits de base (toujours là)</string>
+    <string name="pantry_basics_show">Afficher les produits de base</string>
+    <string name="pantry_basics_hide">Masquer les produits de base</string>
+    <string name="pantry_basics_empty">Glissez ici ce que la cuisine n’épuise jamais</string>
+    <string name="pantry_moved_to_basics">%1$s → produits de base</string>
+    <string name="pantry_moved_from_basics">%1$s → stock normal</string>
     <string name="shopping_added">Ajouté à la liste de courses</string>
 
     <!-- Meal plan -->
@@ -552,6 +571,7 @@
     <string name="lang_german">Deutsch</string>
     <string name="lang_english">English</string>
     <string name="lang_french">Français</string>
+    <string name="lang_spanish">Español</string>
     <string name="lang_arabic">العربية</string>
 
     <!-- Recipe categories (stored as keys, shown localized) -->

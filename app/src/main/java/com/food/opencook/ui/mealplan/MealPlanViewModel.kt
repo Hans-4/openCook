@@ -33,6 +33,7 @@ import com.food.opencook.util.Numbers
 import com.food.opencook.util.RecipeAvailability
 import com.food.opencook.util.MealTypes
 import com.food.opencook.util.PlanWindow
+import com.food.opencook.sync.SyncTrigger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -97,6 +98,7 @@ class MealPlanViewModel @Inject constructor(
     private val shoppingRepository: ShoppingRepository,
     private val pantryRepository: PantryRepository,
     private val settingsRepository: SettingsRepository,
+    private val syncTrigger: SyncTrigger,
 ) : ViewModel() {
 
     private val labelFormat = DateLabels.weekdayDayMonth()
@@ -389,10 +391,17 @@ class MealPlanViewModel @Inject constructor(
      * on every tab switch, so this runs on every entry, and both halves are built to notice
      * that in two small queries and stop. A stale "done for today" flag would be the worse
      * trade — it would sit out the moment a household adds its first recipes.
+     *
+     * It does wait for the app's first sync round, though (bounded, see
+     * [SyncTrigger.awaitFirstRound]): on a phone that hasn't been open for a while the plan is
+     * stale, and filling or purging it before the household's data arrives would plan days
+     * the others already planned — overwriting them — or drop entries whose recipes are
+     * simply not here yet.
      */
     fun openPlan() {
         refreshToday()
         viewModelScope.launch {
+            syncTrigger.awaitFirstRound()
             mealPlanRepository.purgeOrphanEntries()
             reconcilePastDays().join()
             autoFillWindow().join()

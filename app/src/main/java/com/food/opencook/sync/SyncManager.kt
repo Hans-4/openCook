@@ -37,6 +37,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -44,6 +46,16 @@ import javax.inject.Singleton
 /** Lets the rest of the app ask for a sync without depending on the engine. */
 interface SyncTrigger {
     fun requestSync()
+
+    /**
+     * Wait — briefly — until this process's first sync round has been tried, whatever its
+     * outcome. Work that must not act on stale data waits on it: the rolling meal planner,
+     * so a phone opened after weeks away first learns what the household planned meanwhile
+     * instead of planning those days afresh (auto-filled cells share their id across devices,
+     * so its picks would overwrite the others'). If that round can't reach anyone, the work
+     * goes ahead and the latest write wins, as everywhere else.
+     */
+    suspend fun awaitFirstRound() {}
 }
 
 /**
@@ -123,6 +135,15 @@ class SyncManager @Inject constructor(
         triggers.tryEmit(Unit)
     }
 
+    /** Settles once the first round of this process has had its try (see [awaitFirstRound]). */
+    private val firstRound = CompletableDeferred<Unit>()
+
+    override suspend fun awaitFirstRound() {
+        // Bounded: a round that can't reach the server waits out its connect timeouts, and
+        // the plan shouldn't sit still for that long.
+        withTimeoutOrNull(FIRST_ROUND_WAIT_MS) { firstRound.await() }
+    }
+
     /** Manual sync from the top-bar icon — runs immediately (no debounce). */
     fun syncNow() {
         scope.launch { runSync(manual = true) }
@@ -142,16 +163,24 @@ class SyncManager @Inject constructor(
      *   gets visible feedback even when there was nothing to do.
      */
     private suspend fun runSync(manual: Boolean = false) = mutex.withLock {
+        try {
+            runRound(manual)
+        } finally {
+            firstRound.complete(Unit)
+        }
+    }
+
+    private suspend fun runRound(manual: Boolean) {
         if (settings.householdCodeOnce().isNullOrBlank()) {
             _status.value = SyncStatus.NotConfigured
-            return@withLock
+            return
         }
         if (!onHomeNetwork) {
             // Nothing to try: both targets are LAN addresses. Tapping the icon lands
             // here too — the user gets the explanation, not a 20-second timeout.
             _serverReachable.value = false
             _status.value = SyncStatus.OffHomeNetwork
-            return@withLock
+            return
         }
         val startedAt = System.currentTimeMillis()
         val visible = manual || !hasCompletedRound
@@ -208,6 +237,7 @@ class SyncManager @Inject constructor(
 
     private companion object {
         const val DEBOUNCE_MS = 1_500L
+        const val FIRST_ROUND_WAIT_MS = 10_000L
         const val PERIODIC_MS = 30_000L
         const val MIN_MANUAL_FEEDBACK_MS = 600L
     }

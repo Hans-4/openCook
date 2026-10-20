@@ -40,6 +40,8 @@ import com.food.opencook.ui.navigation.Routes
 import com.food.opencook.util.DurationFormat
 import com.food.opencook.util.MealTypes
 import com.food.opencook.util.Numbers
+import com.food.opencook.util.PastedList
+import com.food.opencook.data.recipeimport.IngredientLineParser
 import com.food.opencook.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -52,6 +54,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 /** Linear wizard the editor walks the user through. Order matches array index for the
@@ -103,6 +106,7 @@ data class EditableRecipe(
     val lastCookedAt: String? = null,
     val totalTime: String? = null,
     val description: String? = null,
+    val sourceUrl: String? = null,
 )
 
 /**
@@ -110,6 +114,7 @@ data class EditableRecipe(
  * [suggestion]/[autoCorrected] are UI-only review hints from the ingredient corrector
  * (never persisted): a non-null [suggestion] offers a tap-to-apply fix, [autoCorrected] marks
  * a name the corrector already snapped to a known term.
+ * [rowKey] identifies the row in the editor list while it is dragged (see [EditableInstruction]).
  */
 data class EditableIngredient(
     val id: String?,
@@ -118,9 +123,18 @@ data class EditableIngredient(
     val name: String,
     val suggestion: String? = null,
     val autoCorrected: Boolean = false,
+    val rowKey: Long = nextRowKey(),
 )
 
-data class EditableInstruction(val id: String?, val text: String)
+/**
+ * [rowKey] is a UI-only list key, never persisted: the drag-to-reorder list needs one that is
+ * unique and survives a move, and [id] is null for every freshly added row. `copy()` keeps it.
+ */
+data class EditableInstruction(val id: String?, val text: String, val rowKey: Long = nextRowKey())
+
+private val rowKeys = AtomicLong()
+
+private fun nextRowKey(): Long = rowKeys.incrementAndGet()
 
 data class EditableNutrition(
     val calories: String,
@@ -156,6 +170,20 @@ class ReviewViewModel @Inject constructor(
     private val _message = MutableStateFlow<String?>(null)
     val message: StateFlow<String?> = _message.asStateFlow()
     fun clearMessage() { _message.value = null }
+
+    /** A list just pasted into the editor and split into rows — the screen offers "Undo".
+     *  [seq] makes two identical pastes in a row two events. */
+    data class Pasted(val steps: Boolean, val count: Int, val seq: Long)
+
+    private val _pasted = MutableStateFlow<Pasted?>(null)
+    val pasted: StateFlow<Pasted?> = _pasted.asStateFlow()
+    private var pasteSeq = 0L
+
+    /** Done with [event] — unless a newer paste has replaced it meanwhile. */
+    fun clearPasted(event: Pasted) { _pasted.compareAndSet(event, null) }
+
+    /** The recipe (by page) as it was before the last split, for [undoPaste]. */
+    private var beforePaste: Pair<Int, EditableRecipe>? = null
 
     private val _conflict = MutableStateFlow<NameConflict?>(null)
     /** Set when a save was blocked by a same-named recipe; the screen offers the way out. */
@@ -253,6 +281,62 @@ class ReviewViewModel @Inject constructor(
 
     fun removeStep(index: Int, stepIndex: Int) = updateRecipe(index) {
         it.copy(instructions = it.instructions.filterIndexed { i, _ -> i != stepIndex })
+    }
+
+    /**
+     * A multi-line paste into one ingredient's name field (GitHub #28): a name never holds
+     * a line break, so this is a list — each line becomes a row, read like an imported
+     * ingredient line ("400 g Spaghetti" → amount, unit, name). The first line fills the row
+     * pasted into, the rest follow it.
+     */
+    fun pasteIngredients(index: Int, at: Int, text: String) {
+        val parsed = PastedList.ingredientLines(text).map { line ->
+            val dto = IngredientLineParser.parse(line)
+            EditableIngredient(null, Numbers.formatQuantity(dto.quantity).orEmpty(), dto.unit.orEmpty(), dto.name)
+        }
+        if (parsed.size < 2) {
+            // A single line after all (e.g. "Salz\n"): just its text, as if typed.
+            val name = PastedList.ingredientLines(text).firstOrNull().orEmpty()
+            updateRecipe(index) { r ->
+                r.copy(ingredients = r.ingredients.mapIndexed { j, ing ->
+                    if (j == at) ing.copy(name = name, suggestion = null, autoCorrected = false) else ing
+                })
+            }
+            return
+        }
+        splitInto(index, steps = false, count = parsed.size) { r ->
+            val rows = r.ingredients.toMutableList()
+            val target = rows.getOrNull(at) ?: return@splitInto r
+            rows[at] = parsed.first().copy(id = target.id, rowKey = target.rowKey)
+            rows.addAll(at + 1, parsed.drop(1))
+            r.copy(ingredients = rows)
+        }
+    }
+
+    /** A pasted list in one step field — see [PastedList.isPastedSteps] — split into steps. */
+    fun pasteSteps(index: Int, at: Int, text: String) {
+        val steps = PastedList.steps(text)
+        splitInto(index, steps = true, count = steps.size) { r ->
+            val rows = r.instructions.toMutableList()
+            val target = rows.getOrNull(at) ?: return@splitInto r
+            rows[at] = target.copy(text = steps.first())
+            rows.addAll(at + 1, steps.drop(1).map { EditableInstruction(id = null, text = it) })
+            r.copy(instructions = rows)
+        }
+    }
+
+    private fun splitInto(index: Int, steps: Boolean, count: Int, transform: (EditableRecipe) -> EditableRecipe) {
+        val before = _recipes.value?.getOrNull(index) ?: return
+        beforePaste = index to before
+        updateRecipe(index, transform)
+        _pasted.value = Pasted(steps, count, ++pasteSeq)
+    }
+
+    /** Put the page back as it was before the last split — one paste of a list, undone. */
+    fun undoPaste() {
+        val (index, before) = beforePaste ?: return
+        beforePaste = null
+        updateRecipe(index) { before }
     }
 
     /** Move an ingredient row (drag & drop in the editor); its position is what gets saved and synced. */
@@ -445,6 +529,7 @@ class ReviewViewModel @Inject constructor(
             cookTime = DurationFormat.toIso(e.cookTime),
             totalTime = e.totalTime,
             description = e.description,
+            sourceUrl = e.sourceUrl,
             tags = e.tags,
             lastCookedAt = e.lastCookedAt,
             sourcePhotoId = e.sourcePhotoId,
@@ -503,6 +588,7 @@ private fun RecipeWithDetails.toEditable() = EditableRecipe(
     lastCookedAt = recipe.lastCookedAt,
     totalTime = recipe.totalTime,
     description = recipe.description,
+    sourceUrl = recipe.sourceUrl,
     ingredients = ingredients.sortedBy { it.position }
         .map { EditableIngredient(it.id, Numbers.formatQuantity(it.quantity).orEmpty(), it.unit.orEmpty(), it.name) },
     instructions = instructions.sortedBy { it.position }.map { EditableInstruction(it.id, it.text) },
