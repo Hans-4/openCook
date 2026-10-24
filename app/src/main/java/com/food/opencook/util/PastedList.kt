@@ -29,16 +29,16 @@ object PastedList {
 
     /**
      * A step's own number, which the app adds itself: "1.", "2)", "(3)", "Step 4:",
-     * "Schritt 5", … A number is only taken when it's clearly a marker — followed by "." or
+     * "Schritt 5", "١.", … A number is only taken when it's clearly a marker — followed by "." or
      * ")" and a space — so "2 Eier verquirlen" or "1.5 l Wasser" keep theirs.
      */
     private val STEP_NUMBER = Regex(
-        """^(?:(?:step|schritt|étape|etape|paso)\s*\d+\s*[.:)\-–]?|\d+[.)](?=\s)|\(\d+\))\s*""",
+        """^(?:(?:step|schritt|étape|etape|paso|الخطوة|خطوة)\s*\p{Nd}+\s*[.:)\-–]?|\p{Nd}+[.)](?=\s)|\(\p{Nd}+\))\s*""",
         RegexOption.IGNORE_CASE,
     )
 
     /** A line that is nothing but a step number ("3"), as some sites lay steps out. */
-    private val NUMBER_ONLY = Regex("""^\d+[.)]?$""")
+    private val NUMBER_ONLY = Regex("""^\p{Nd}+[.)]?$""")
 
     private val BLANK_LINE = Regex("""\n\s*\n""")
 

@@ -66,6 +66,24 @@
     <string name="review_notes">ملاحظات</string>
     <string name="review_add_ingredient">إضافة مكوّن</string>
     <string name="review_add_step">إضافة خطوة</string>
+    <string name="review_paste_hint_ingredient">مكوّن — أو الصق قائمة كاملة</string>
+    <string name="review_paste_hint_step">صِف الخطوة — أو الصق كل الخطوات</string>
+    <plurals name="review_pasted_ingredients">
+        <item quantity="zero">تقسيم إلى %1$d مكوّن</item>
+        <item quantity="one">تقسيم إلى %1$d مكوّن</item>
+        <item quantity="two">تقسيم إلى %1$d مكوّنين</item>
+        <item quantity="few">تقسيم إلى %1$d مكوّنات</item>
+        <item quantity="many">تقسيم إلى %1$d مكوّنًا</item>
+        <item quantity="other">تقسيم إلى %1$d مكوّن</item>
+    </plurals>
+    <plurals name="review_pasted_steps">
+        <item quantity="zero">تقسيم إلى %1$d خطوة</item>
+        <item quantity="one">تقسيم إلى %1$d خطوة</item>
+        <item quantity="two">تقسيم إلى %1$d خطوتين</item>
+        <item quantity="few">تقسيم إلى %1$d خطوات</item>
+        <item quantity="many">تقسيم إلى %1$d خطوةً</item>
+        <item quantity="other">تقسيم إلى %1$d خطوة</item>
+    </plurals>
     <string name="review_save">حفظ</string>
     <string name="review_image_take">التقاط صورة</string>
     <string name="review_image_gallery">المعرض</string>
@@ -212,6 +230,7 @@
     <string name="shopping_nf_adapt">تحديد كمنجز</string>
     <string name="shopping_adapted">تم التحديد كمنجز</string>
     <string name="scan_manual">إنشاء يدويًا</string>
+    <string name="recipe_open_source">فتح الوصفة الأصلية</string>
     <string name="recipe_add_to_plan">إضافة إلى خطة الأسبوع</string>
     <string name="recipe_plan_sheet_title">اختر يومًا</string>
     <string name="recipe_plan_added">تمت الإضافة ليوم %1$s</string>
@@ -256,6 +275,12 @@
     <!-- Pantry -->
     <string name="pantry_add_hint">أضف عنصرًا إلى المخزن…</string>
     <string name="pantry_empty">لا توجد عناصر في المخزن بعد.</string>
+    <string name="pantry_basics">الأساسيات (متوفرة دائمًا)</string>
+    <string name="pantry_basics_show">إظهار الأساسيات</string>
+    <string name="pantry_basics_hide">إخفاء الأساسيات</string>
+    <string name="pantry_basics_empty">اسحب عنصرًا إلى هنا حتى لا يستهلكه الطبخ أبدًا</string>
+    <string name="pantry_moved_to_basics">%1$s ← الأساسيات</string>
+    <string name="pantry_moved_from_basics">%1$s ← المخزون العادي</string>
     <string name="shopping_added">تمت الإضافة إلى قائمة التسوق</string>
 
     <!-- Meal plan -->
@@ -587,6 +612,7 @@
     <string name="lang_german">Deutsch</string>
     <string name="lang_english">English</string>
     <string name="lang_french">Français</string>
+    <string name="lang_spanish">Español</string>
     <string name="lang_arabic">العربية</string>
 
     <!-- Recipe categories (stored as keys, shown localized) -->

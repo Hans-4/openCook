@@ -19,6 +19,7 @@
 package com.food.opencook.data.recipeimport
 
 import com.food.opencook.data.remote.dto.IngredientDto
+import com.food.opencook.util.TextFold
 
 /**
  * Best-effort parser for a free-text ingredient line ("600 g Hackfleisch, halb und halb",
@@ -69,7 +70,8 @@ object IngredientLineParser {
     )
 
     fun parse(raw: String): IngredientDto {
-        val s = raw.trim()
+        // "٤٠٠ غ دقيق" → ASCII digits, so the quantity regex below sees a number.
+        val s = TextFold.digits(raw.trim())
         if (s.isEmpty()) return IngredientDto(null, null, raw.trim())
 
         // Leading unicode fraction, e.g. "½ TL Salz".
@@ -78,8 +80,8 @@ object IngredientLineParser {
             return IngredientDto(value, unit, name)
         }
 
-        val match = LEADING_QTY.find(s) ?: return IngredientDto(null, null, s)
-        val quantity = parseQuantity(match.groupValues[1]) ?: return IngredientDto(null, null, s)
+        val match = LEADING_QTY.find(s) ?: return IngredientDto(null, null, raw.trim())
+        val quantity = parseQuantity(match.groupValues[1]) ?: return IngredientDto(null, null, raw.trim())
         val rest = s.substring(match.range.last + 1).trim()
         val (unit, name) = splitUnit(rest)
         return IngredientDto(quantity, unit, name.ifBlank { s })
@@ -120,7 +122,7 @@ object IngredientLineParser {
         val parts = rest.trim().split(Regex("\\s+"))
         for (n in minOf(MAX_UNIT_WORDS, parts.size - 1) downTo 1) {
             val candidate = parts.take(n).joinToString(" ")
-            val norm = candidate.lowercase()
+            val norm = TextFold.forMatch(candidate)
                 .removeSuffix(".").removeSuffix("/n").removeSuffix("(n)").removeSuffix("(en)").removeSuffix(".")
             if (norm in UNITS) return candidate to parts.drop(n).joinToString(" ")
         }

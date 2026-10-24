@@ -133,6 +133,7 @@ object IngredientMatch {
         if (x == y) return true
         if (IngredientLexicon.sameSynonym(x, y)) return true
         if (vocabulary.pluralSuffixes.any { suf -> isPluralOf(x, y, suf) || isPluralOf(y, x, suf) }) return true
+        if (isArabicFemininePlural(x, y) || isArabicFemininePlural(y, x)) return true
         // Compound-noun head: in German the right-most part is the head ("Weizen-mehl" → mehl).
         // Only conflate when that head is a staple — otherwise distinct products that merely
         // share a suffix ("Kichererbsen"/"Erbsen") would collapse together.
@@ -173,6 +174,9 @@ object IngredientMatch {
     private fun headOf(name: String): String {
         val tokens = name.trim().split(Regex("\\s+"))
         if (tokens.size >= 2 && isHeadConnector(tokens[1])) return tokens[0]
+        // Arabic puts the head first with no connector at all: the adjective or the
+        // possessor simply follows ("فلفل اسود", "زيت زيتون").
+        if (TextFold.isArabic(name)) return tokens.first()
         return tokens.last()
     }
 
@@ -190,12 +194,12 @@ object IngredientMatch {
     private val normalizeCache = java.util.concurrent.ConcurrentHashMap<String, String>()
 
     /**
-     * Lowercases, strips parentheticals / trailing use-phrases / leaked leading amounts, and
+     * Lowercases and folds digits/Arabic spellings ([TextFold.forMatch]), strips parentheticals / trailing use-phrases / leaked leading amounts, and
      * folds German cooking-vocab variants ("Soße" ↔ "Sauce", "ß" → "ss") so "Sojasoße" and
      * "Sojasauce" compare equal.
      */
     private fun normalize(s: String): String = normalizeCache.computeIfAbsent(s) { raw ->
-        var t = raw.lowercase().replace(PARENTHETICAL, "")
+        var t = TextFold.forMatch(raw).replace(PARENTHETICAL, "")
         usePhraseRe?.let { t = t.replace(it, "") }
         t = t.trim()
         // The noise list runs on both sides of the number, so "etwas Öl" and "3 Löffel Öl"
@@ -217,9 +221,15 @@ object IngredientMatch {
     private fun isPluralOf(whole: String, stem: String, suf: String): Boolean =
         whole.length - suf.length >= MIN_STEM && whole.endsWith(suf) && whole.dropLast(suf.length) == stem
 
+    /** Arabic sound feminine plural: the final ة (folded to ه) becomes ات — "قطرة"/"قطرات". */
+    private fun isArabicFemininePlural(whole: String, stem: String): Boolean =
+        stem.length >= MIN_STEM && stem.endsWith('ه') && whole == stem.dropLast(1) + "ات"
+
     /** True if [head] is the right-most component of compound [whole] ("Mehl" in "Weizenmehl"). */
     private fun isCompoundHead(whole: String, head: String): Boolean =
-        head.length >= MIN_STEM &&
+        // Arabic doesn't glue nouns together, so a shared ending is coincidence ("مملح"/"ملح").
+        !TextFold.isArabic(whole) &&
+            head.length >= MIN_STEM &&
             whole.length - head.length >= MIN_STEM &&
             whole.endsWith(head)
 

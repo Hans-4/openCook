@@ -52,6 +52,9 @@ class MealTypesTest {
             MealTypes.setAliases(saved + mapOf("dîner" to "dinner", "goûter" to "snack"))
             assertEquals("dinner", MealTypes.normalizeKey(" Dîner "))
             assertEquals("snack", MealTypes.normalizeKey("Goûter"))
+            // Arabic aliases match with the article and hamza spelling folded away.
+            MealTypes.setAliases(saved + mapOf("افطار" to "breakfast"))
+            assertEquals("breakfast", MealTypes.normalizeKey("الإفطار"))
             // The stable keys never depend on the alias table.
             assertEquals("lunch", MealTypes.normalizeKey("lunch"))
         } finally {

@@ -81,4 +81,10 @@ class PastedListTest {
         // One line pasted, even with a trailing break, stays a single step.
         assertFalse(PastedList.isPastedSteps("", "Ofen vorheizen.\n"))
     }
+
+    @Test
+    fun `arabic step numbers are removed`() {
+        assertEquals(listOf("سخّن الفرن", "اخلط الدقيق"), PastedList.steps("١. سخّن الفرن\n٢. اخلط الدقيق"))
+        assertEquals(listOf("قطّع البصل"), PastedList.steps("الخطوة ١: قطّع البصل"))
+    }
 }

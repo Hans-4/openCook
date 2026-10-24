@@ -27,7 +27,7 @@
     </string-array>
     <string-array name="grocery_kw_meat_fish">
         <item>دجاج</item><item>"ديك رومي"</item><item>"لحم بقر"</item><item>"لحم خنزير"</item><item>بيكون</item>
-        <item>هام</item><item>سجق</item><item>سلامي</item><item>"لحم مفروم"</item><item>مفروم</item>
+        <item>هام</item><item>سجق</item><item>سلامي</item><item>"لحم مفروم"</item><item>كفتة</item>
         <item>ستيك</item><item>"لحم ضأن"</item><item>لحم</item><item>سلمون</item><item>تونة</item>
         <item>ربيان</item><item>جمبري</item><item>سمك</item><item>فيليه</item><item>"شرائح سمك"</item>
         <item>"سمك القد"</item><item>"سلمون مرقط"</item>
@@ -40,7 +40,7 @@
         <item>برتقال</item><item>توت</item><item>"توت بري"</item><item>أفوكادو</item><item>زنجبيل</item>
         <item>"فلفل حار"</item><item>"فلفل أحمر"</item><item>بقدونس</item><item>ريحان</item><item>"ثوم معمر"</item>
         <item>فاصولياء</item><item>"بازلاء"</item><item>ذرة</item><item>يقطين</item><item>باذنجان</item>
-        <item>باذنجان</item><item>كرفس</item><item>جرجير</item><item>جرجير</item><item>كمثرى</item>
+        <item>بندورة</item><item>كرفس</item><item>جرجير</item><item>كمثرى</item>
         <item>عنب</item><item>مانجو</item><item>أعشاب</item><item>خضار</item><item>فاكهة</item>
     </string-array>
     <string-array name="grocery_kw_bakery">
@@ -54,9 +54,9 @@
     <string-array name="grocery_kw_spices">
         <item>ملح</item><item>فلفل</item><item>بابريكا</item><item>كاري</item><item>كمون</item>
         <item>قرفة</item><item>"جوز الطيب"</item><item>أوريغانو</item><item>زعتر</item><item>"إكليل الجبل"</item>
-        <item>"صلصة الصويا"</item><item>خل</item><item>خردل</item><item>كاتشب</item><item>مايونيز</item>
+        <item>"صلصة الصويا"</item><item>"خل "</item><item>خردل</item><item>كاتشب</item><item>مايونيز</item>
         <item>مرق</item><item>مرقة</item><item>"معجون الطماطم"</item><item>فانيليا</item><item>بهارات</item>
-        <item>"زيت زيتون"</item><item>"زيت"</item><item>صلصة</item>
+        <item>"زيت زيتون"</item><item>"زيت "</item><item>صلصة</item>
     </string-array>
     <string-array name="grocery_kw_pantry">
         <item>نودلز</item><item>سباغيتي</item><item>معكرونة</item><item>أرز</item><item>دقيق</item>
@@ -135,19 +135,19 @@
         <item>نودلز</item><item>مكرونة</item><item>معكرونة</item><item>باستا</item>
     </string-array>
     <string-array name="cat_alias_meat">
-        <item>لحم</item><item>لحوم</item><item>دواجن</item>
+        <item>لحم</item><item>لحوم</item><item>دواجن</item><item>دجاج</item>
     </string-array>
     <string-array name="cat_alias_fish">
         <item>سمك</item><item>أسماك</item><item>"مأكولات بحرية"</item>
     </string-array>
     <string-array name="cat_alias_soup">
-        <item>شوربة</item><item>حساء</item><item>يخنة</item>
+        <item>شوربة</item><item>شوربات</item><item>حساء</item><item>يخنة</item>
     </string-array>
     <string-array name="cat_alias_vegetarian">
-        <item>نباتي</item><item>خضار</item><item>فيغان</item>
+        <item>نباتي</item><item>نباتية</item><item>فيغان</item><item>فيجان</item>
     </string-array>
     <string-array name="cat_alias_salad">
-        <item>سلطة</item>
+        <item>سلطة</item><item>سلطات</item>
     </string-array>
     <string-array name="cat_alias_dessert">
         <item>حلوى</item><item>حلويات</item>
@@ -194,9 +194,11 @@
         <item>حسب</item><item>"من أجل"</item>
     </string-array>
 
-    <!-- Suffixes relating a plural to its singular ("tomatoes"/"tomato"). -->
+    <!-- Suffixes relating a plural to its singular ("tomatoes"/"tomato"). Only the plain
+         sound plural (معلب/معلبات): ة → ات (قطرة/قطرات) is handled in code, and broken plurals
+         (شريحة/شرائح) cannot be a suffix rule — they belong in ingredient_synonyms. -->
     <string-array name="ingredient_plural_suffixes">
-        <item>ات</item><item>ون</item>
+        <item>ات</item>
     </string-array>
 
     <!-- Words marking the modifier of a head-INITIAL compound ("huile d\'olive" → huile).
@@ -210,7 +212,9 @@
         <item>كزبرة|كزبرة خضراء</item>
         <item>بساتا|صلصة طماطم مصفاة|طماطم مصفاة</item>
         <item>بيكربونات الصوديوم|صودا الخبز</item>
-        <item>نشا الذرة|دقيق الذرة</item>
+        <item>بيضة|بيض</item>
+        <item>طماطم|بندورة</item>
+        <item>كوسا|كوسة</item>
     </string-array>
 
     <!-- "Never the same" pairs, "|"-separated, exactly two per line. These block a staple from
@@ -228,6 +232,13 @@
         <item>زيت الكمأة|زيت</item>
         <item>خل بلسمي|خل</item>
         <item>دقيق الأرز|دقيق</item>
+        <item>دقيق الذرة|دقيق</item>
+        <item>فلفل رومي|فلفل</item>
+        <item>فلفل حار|فلفل</item>
+        <item>فلفل أحمر|فلفل</item>
+        <item>زبدة الفول السوداني|زبدة</item>
+        <item>ماء الورد|ماء</item>
+        <item>ماء الزهر|ماء</item>
     </string-array>
 
     <!-- discover_sites is intentionally omitted: the default (English) board lists only English-language

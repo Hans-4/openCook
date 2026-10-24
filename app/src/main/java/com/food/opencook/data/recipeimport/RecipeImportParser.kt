@@ -24,6 +24,7 @@ import com.food.opencook.data.remote.dto.NutritionDto
 import com.food.opencook.data.remote.dto.RecipeDto
 import com.food.opencook.util.RecipeCategories
 import com.food.opencook.util.SourceLink
+import com.food.opencook.util.TextFold
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -354,7 +355,7 @@ object RecipeImportParser {
     private fun String?.toLines(): List<String> =
         this?.split("\n")?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
 
-    /** First integer at the start of e.g. "4 Portionen" → 4; null if none. */
+    /** First integer at the start of e.g. "4 Portionen" / "٤ حصص" → 4; null if none. */
     private fun leadingInt(s: String): Int? =
-        Regex("""^\s*(\d{1,3})""").find(s)?.groupValues?.get(1)?.toIntOrNull()
+        Regex("""^\s*(\d{1,3})""").find(TextFold.digits(s))?.groupValues?.get(1)?.toIntOrNull()
 }

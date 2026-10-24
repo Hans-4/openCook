@@ -30,8 +30,8 @@ class DurationFormatTest {
     // The unit words and labels come from arrays.xml/strings.xml at runtime; a JVM test seeds
     // them itself. Parsing always accepts every language at once — that is the point of the
     // union — while the label is whatever the phone's language writes.
-    private val hourWords = listOf("stunden", "stunde", "std", "h", "heures", "heure", "hours", "hour")
-    private val minuteWords = listOf("minuten", "minute", "min", "m", "minutes", "mn", "mins")
+    private val hourWords = listOf("stunden", "stunde", "std", "h", "heures", "heure", "hours", "hour", "ساعات", "ساعة")
+    private val minuteWords = listOf("minuten", "minute", "min", "m", "minutes", "mn", "mins", "دقائق", "دقيقة")
 
     @Before fun german() {
         DurationFormat.setUnits(hourWords, minuteWords)
@@ -129,6 +129,13 @@ class DurationFormatTest {
     // --- Cooking times inside a recipe step (the detail screen's timer links) -------------
 
     private fun found(text: String) = DurationFormat.findIn(text).map { text.substring(it.range) to it.seconds }
+
+    /** Arabic-Indic digits are folded one-for-one, so the timer range still marks the original text. */
+    @Test
+    fun arabicDigitsInAStep() {
+        assertEquals(listOf("١٠ دقائق" to 600), found("اطبخ لمدة ١٠ دقائق"))
+        assertEquals("PT90M", DurationFormat.toIso("١ ساعة ٣٠ دقيقة"))
+    }
 
     @Test
     fun findsMinutesAndHoursInAStep() {

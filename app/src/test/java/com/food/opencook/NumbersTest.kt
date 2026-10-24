@@ -73,6 +73,14 @@ class NumbersTest {
         assertEquals("dessert", RecipeCategories.matchKeyOrNull(" Nachtisch ")) // alias, trimmed
         assertEquals("other", RecipeCategories.matchKeyOrNull("other")) // a real answer
         assertNull(RecipeCategories.matchKeyOrNull("Hauptspeise")) // a meal, not a category
+        // Arabic: the article and spelling variants are folded before the alias lookup.
+        val saved = RecipeCategories.activeAliases
+        try {
+            RecipeCategories.setAliases(saved + mapOf("لحوم" to "meat"))
+            assertEquals("meat", RecipeCategories.matchKeyOrNull("اللحوم"))
+        } finally {
+            RecipeCategories.setAliases(saved)
+        }
         assertNull(RecipeCategories.matchKeyOrNull(""))
         assertNull(RecipeCategories.matchKeyOrNull(null))
         // normalizeKey keeps flattening for the storage/filter paths.
@@ -86,5 +94,12 @@ class NumbersTest {
         assertEquals(70, DurationFormat.minutes("PT1H10M"))
         assertNull(DurationFormat.minutes(null))
         assertNull(DurationFormat.minutes("nonsense"))
+    }
+
+    @Test
+    fun arabicDigitsAreAQuantity() {
+        assertEquals(400.0, Numbers.parseQuantity("٤٠٠")!!, 1e-9)
+        assertEquals(1.5, Numbers.parseQuantity("١٫٥")!!, 1e-9)
+        assertEquals(2.0, Numbers.parseQuantity("۲")!!, 1e-9) // Persian/Urdu digit forms
     }
 }
