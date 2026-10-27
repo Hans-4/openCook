@@ -59,18 +59,18 @@ object Numbers {
  */
 object RecipeCategories {
     /** Stable keys persisted in the DB + sync log. */
-    val KEYS = listOf("pasta", "meat", "fish", "soup", "vegetarian", "salad", "dessert", "other")
+    val KEYS = listOf("soup", "salad", "dessert", "snack", "drink", "other")
     const val DEFAULT = "other"
 
     @StringRes
     fun labelRes(key: String?): Int = when (normalizeKey(key)) {
-        "pasta" -> R.string.cat_pasta
         "meat" -> R.string.cat_meat
         "fish" -> R.string.cat_fish
         "soup" -> R.string.cat_soup
-        "vegetarian" -> R.string.cat_vegetarian
         "salad" -> R.string.cat_salad
         "dessert" -> R.string.cat_dessert
+        "snack" -> R.string.cat_snack
+        "drink" -> R.string.cat_drink
         else -> R.string.cat_other
     }
 
@@ -114,6 +114,49 @@ object RecipeCategories {
     fun normalizeKey(raw: String?): String = matchKeyOrNull(raw) ?: DEFAULT
 
     /** Display label: localized for known/legacy values; a custom free-text value is kept verbatim. */
+    fun displayLabel(context: Context, raw: String?): String {
+        if (raw.isNullOrBlank()) return context.getString(R.string.cat_other)
+        // "Other" is a real answer, not a miss — matchKeyOrNull tells the two apart, so the
+        // user's own free text survives instead of collapsing into the "Other" label.
+        val key = matchKeyOrNull(raw) ?: return raw.trim()
+        return context.getString(labelRes(key))
+    }
+}
+
+object DietType {
+    val KEYS = listOf("meat", "vegetarian", "vegan", "pescetarian", "other")
+    const val DEFAULT = "other"
+
+    @StringRes
+    fun labelRes(key: String): Int = when (key) {
+        "meat" -> R.string.diet_meat
+        "vegetarian" -> R.string.diet_vegetarian
+        "vegan" -> R.string.diet_vegan
+        "pescetarian" -> R.string.diet_pescetarian
+        else -> R.string.diet_other
+    }
+
+    private val DEFAULT_ALIASES_DE_EN: Map<String, String> = mapOf(
+        "fleisch" to "meat", "normal" to "meat", "omnivor" to "meat",
+        "vegitarisch" to "vegetarian",
+        "pescetarisch" to "pescetarian",
+    )
+
+    @Volatile
+    private var aliases: Map<String, String> = DietType.DEFAULT_ALIASES_DE_EN
+
+    fun setAliases(newAliases: Map<String, String>) {
+        if (newAliases.isNotEmpty()) aliases = newAliases
+    }
+    val activeAliases: Map<String, String> get() = aliases
+
+    fun matchKeyOrNull(raw: String?): String? {
+        val t = raw?.trim()?.lowercase()?.takeIf { it.isNotEmpty() } ?: return null
+        return if (t in KEYS) t else aliases[t]
+    }
+
+    fun normalizeKey(raw: String?): String = matchKeyOrNull(raw) ?: DEFAULT
+
     fun displayLabel(context: Context, raw: String?): String {
         if (raw.isNullOrBlank()) return context.getString(R.string.cat_other)
         // "Other" is a real answer, not a miss — matchKeyOrNull tells the two apart, so the

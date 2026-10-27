@@ -130,6 +130,7 @@ import com.food.opencook.util.MealTypes
 import com.food.opencook.util.PastedList
 import com.food.opencook.util.RecipeCategories
 import com.food.opencook.ui.theme.Spacing
+import com.food.opencook.util.DietType
 import kotlin.math.roundToInt
 
 /* ------------------------------------------------------------------------- */
@@ -179,6 +180,11 @@ fun BasicsStep(
             onPick = { v -> viewModel.updateRecipe(index) { it.copy(category = v) } },
         )
         Spacer(Modifier.height(Spacing.md))
+
+        DietaryChips(
+            current = recipe.dietType,
+            onPick = { v -> viewModel.updateRecipe(index) { it.copy(dietType = v)} }
+        )
 
         MealTypeChips(
             selected = recipe.mealTypes,
@@ -1142,6 +1148,30 @@ internal fun CategoryChips(current: String, onPick: (String) -> Unit, showLabel:
                     selected = selected == key,
                     onClick = { onPick(if (selected == key) "" else key) },
                     label = { Text(stringResource(RecipeCategories.labelRes(key))) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun DietaryChips(current: String, onPick: (String) -> Unit, showLabel: Boolean = true) {
+    val selected = current.takeIf { it.isNotBlank() }?.let { DietType.normalizeKey(it) }
+    Column {
+        if (showLabel) {
+            Text(
+                stringResource(R.string.diet_types),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(Spacing.xs))
+        }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            DietType.KEYS.forEach { key ->
+                FilterChip(
+                    selected = selected == key,
+                    onClick = { onPick(if (selected == key) "" else key) },
+                    label = { Text(stringResource(DietType.labelRes(key))) },
                 )
             }
         }
