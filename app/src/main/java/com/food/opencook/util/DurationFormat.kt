@@ -117,8 +117,9 @@ object DurationFormat {
     /**
      * Every cooking time in a recipe step, in order — what the detail screen turns into
      * timer links. Durations outside 1 s..24 h are dropped; nobody sets a timer for those.
+     * Arabic digits are folded first — one char for one char, so the ranges index [text].
      */
-    fun findIn(text: String): List<TextDuration> = inText.findAll(text).mapNotNull { match ->
+    fun findIn(text: String): List<TextDuration> = inText.findAll(TextFold.digits(text)).mapNotNull { match ->
         val g = match.groupValues
         fun value(s: String) = s.replace(',', '.').toDoubleOrNull() ?: 0.0
         val seconds = if (g[1].isNotEmpty()) {
@@ -162,7 +163,7 @@ object DurationFormat {
      * that carries no recognisable hours/minutes (stored verbatim).
      */
     fun toIso(text: String?): String? {
-        val trimmed = text?.trim().orEmpty()
+        val trimmed = TextFold.digits(text?.trim().orEmpty())
         if (trimmed.isEmpty()) return null
         if (ISO.matches(trimmed)) return trimmed.uppercase()
         val h = hours.find(trimmed)?.groupValues?.get(1)?.toIntOrNull() ?: 0

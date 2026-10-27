@@ -33,6 +33,22 @@ logger = logging.getLogger(__name__)
 SENT_LONG_SIDE = 1008  # multiple of 28, within qwen2.5vl's pixel budget
 
 
+# Arabic spelling variants, folded for word-list lookups (mirror of the app's TextFold):
+# optional vowel marks and tatweel go, hamza-alef forms / ى / ة collapse, and the article
+# "ال" is dropped from a word's start — so "اللحوم" still finds the alias "لحوم".
+_AR_MARKS_RE = re.compile("[\u064B-\u065F\u0670\u0640]")
+_AR_ARTICLE_RE = re.compile(r"(?<!\w)ال(?=\w{2})")
+_AR_LETTERS = str.maketrans({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا", "ى": "ي", "ة": "ه"})
+
+
+def _fold(s: str) -> str:
+    """Lower-case ``s`` and fold Arabic spelling variants; Latin text is only lower-cased."""
+    t = s.strip().lower()
+    if not any("\u0600" <= c <= "\u06FF" for c in t):
+        return t
+    return _AR_ARTICLE_RE.sub("", _AR_MARKS_RE.sub("", t).translate(_AR_LETTERS))
+
+
 # Stable category keys (universal across languages; mirror of the app's RecipeCategories).
 _CATEGORY_KEYS = {"pasta", "meat", "fish", "soup", "vegetarian", "salad", "dessert", "other"}
 
@@ -106,14 +122,14 @@ def load_i18n(language: str | None) -> I18n:
         box_format=data.get("box_format") or base["box_format"],
         duration_hours=tuple(merged("duration_hours")),
         duration_minutes=tuple(merged("duration_minutes")),
-        units=frozenset(u.lower() for u in merged("units")),
+        units=frozenset(_fold(u) for u in merged("units")),
         category_aliases={
-            **{k.lower(): v for k, v in base.get("category_aliases", {}).items()},
-            **{k.lower(): v for k, v in data.get("category_aliases", {}).items()},
+            **{_fold(k): v for k, v in base.get("category_aliases", {}).items()},
+            **{_fold(k): v for k, v in data.get("category_aliases", {}).items()},
         },
         meal_type_aliases={
-            **{k.lower(): v for k, v in base.get("meal_type_aliases", {}).items()},
-            **{k.lower(): v for k, v in data.get("meal_type_aliases", {}).items()},
+            **{_fold(k): v for k, v in base.get("meal_type_aliases", {}).items()},
+            **{_fold(k): v for k, v in data.get("meal_type_aliases", {}).items()},
         },
     )
 
@@ -122,7 +138,7 @@ def _normalize_category(raw: object, aliases: dict[str, str]) -> str | None:
     """Map a model category (any language/case) to a stable key; unknown → "other"."""
     if not isinstance(raw, str) or not raw.strip():
         return None
-    t = raw.strip().lower()
+    t = _fold(raw)
     if t in _CATEGORY_KEYS:
         return t
     return aliases.get(t, "other")
@@ -139,7 +155,7 @@ def _normalize_meal_types(raw: object, aliases: dict[str, str]) -> list[str]:
     for item in items:
         if not isinstance(item, str) or not item.strip():
             continue
-        t = item.strip().lower()
+        t = _fold(item)
         key = t if t in _MEAL_TYPE_KEYS else aliases.get(t)
         if key in _MEAL_TYPE_KEYS and key not in out:
             out.append(key)
@@ -358,10 +374,19 @@ def _num(value: object) -> float | int | None:
     The model occasionally emits a non-numeric ``quantity`` (e.g. it shoves the
     name in: ``"quantity": "Salz"``). Letting that through crashed flatten() and
     would also break the app's ``Double?`` parser, failing the whole job — so any
-    non-number becomes null.
+    non-number becomes null. A number *string* is read, including Arabic-Indic
+    digits ("٤٠٠", "1٫5") — ``float`` understands any Unicode decimal digit.
     """
     if isinstance(value, bool):  # bool is an int subclass; never a quantity
         return None
+    if isinstance(value, str):
+        try:
+            n = float(value.strip().replace("\u066b", ".").replace(",", "."))
+        except ValueError:
+            return None
+        if n != n or n in (float("inf"), float("-inf")):  # "nan"/"inf" parse, but aren't amounts
+            return None
+        return int(n) if n.is_integer() else n
     return value if isinstance(value, (int, float)) else None
 
 
@@ -379,7 +404,7 @@ def _clean_unit(unit: object, name: object, known_units: frozenset[str]) -> str 
     if not u:
         return None
     ul, nl = u.lower(), (name or "").strip().lower() if isinstance(name, str) else ""
-    if ul in known_units:
+    if _fold(u) in known_units:
         return u
     if nl and (ul in nl or nl in ul):
         return None

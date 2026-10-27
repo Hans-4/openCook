@@ -25,9 +25,9 @@ import com.food.opencook.R
 /** Helpers for the structured numeric quantities/servings. */
 object Numbers {
 
-    /** Parse a quantity from text ("400", "1,5", "1.5 ") → 400.0 / 1.5; null if none. */
+    /** Parse a quantity from text ("400", "1,5", "1.5 ", "٤٠٠") → 400.0 / 1.5; null if none. */
     fun parseQuantity(text: String?): Double? =
-        text?.trim()?.replace(',', '.')?.let { Regex("""-?\d+(\.\d+)?""").find(it)?.value?.toDoubleOrNull() }
+        text?.trim()?.let(TextFold::digits)?.replace(',', '.')?.let { Regex("""-?\d+(\.\d+)?""").find(it)?.value?.toDoubleOrNull() }
 
     /** Render a quantity without a trailing ".0" (400.0 → "400", 1.5 → "1.5"). */
     fun formatQuantity(value: Double?): String? {
@@ -106,7 +106,7 @@ object RecipeCategories {
      *  a *meal*, not one of our categories, so it must leave the field empty instead of
      *  silently filing the recipe under [DEFAULT]. */
     fun matchKeyOrNull(raw: String?): String? {
-        val t = raw?.trim()?.lowercase()?.takeIf { it.isNotEmpty() } ?: return null
+        val t = raw?.trim()?.let(TextFold::forMatch)?.takeIf { it.isNotEmpty() } ?: return null
         return if (t in KEYS) t else aliases[t]
     }
 
@@ -215,7 +215,7 @@ object MealTypes {
 
     /** Map an AI/import value (any language) to a stable key; unknown → null (drop, don't guess). */
     fun normalizeKey(raw: String?): String? {
-        val t = raw?.trim()?.lowercase() ?: return null
+        val t = raw?.trim()?.let(TextFold::forMatch) ?: return null
         if (t in KEYS) return t
         return aliases[t]
     }

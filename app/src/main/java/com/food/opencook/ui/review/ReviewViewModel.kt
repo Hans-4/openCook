@@ -41,6 +41,7 @@ import com.food.opencook.util.DurationFormat
 import com.food.opencook.util.MealTypes
 import com.food.opencook.util.Numbers
 import com.food.opencook.util.PastedList
+import com.food.opencook.util.TextFold
 import com.food.opencook.data.recipeimport.IngredientLineParser
 import com.food.opencook.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -545,7 +546,7 @@ class ReviewViewModel @Inject constructor(
                     id = ing.id ?: UUID.randomUUID().toString(), // reuse stable id on edit
                     recipeId = e.id,
                     position = i,
-                    quantity = ing.quantity.trim().replace(',', '.').toDoubleOrNull(),
+                    quantity = TextFold.digits(ing.quantity.trim()).replace(',', '.').toDoubleOrNull(),
                     unit = ing.unit.ifBlank { null },
                     name = ing.name,
                 )

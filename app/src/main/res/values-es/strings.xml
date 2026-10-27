@@ -571,6 +571,7 @@
     <string name="lang_english">English</string>
     <string name="lang_french">Français</string>
     <string name="lang_spanish">Español</string>
+    <string name="lang_arabic">العربية</string>
 
     <!-- Recipe categories (stored as keys, shown localized) -->
     <string name="cat_pasta">Pasta</string>

@@ -138,4 +138,19 @@ class IngredientLineParserTest {
             IngredientLineParser.setUnits(original)
         }
     }
+
+    /** Arabic-Indic digits are a number too; units are folded like the word lists. */
+    @Test fun arabicDigitsAndUnits() {
+        IngredientLineParser.setUnits(setOf("غ", "كوب"))
+        try {
+            val i = p("٤٠٠ غ دقيق")
+            assertEquals(400.0, i.quantity!!, 1e-9)
+            assertEquals("غ", i.unit)
+            assertEquals("دقيق", i.name)
+            assertEquals(1.5, p("١٫٥ كوب ماء").quantity!!, 1e-9)
+            assertNull(p("ملح").quantity)
+        } finally {
+            IngredientLineParser.setUnits(units)
+        }
+    }
 }

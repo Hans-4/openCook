@@ -107,6 +107,14 @@ names — leave them out and the English/German fallback applies, so matching ju
   head noun last ("schwarzer Pfeffer", "black pepper") and leave this empty; French, Spanish and
   Italian put it first and mark the modifier (`de`, `d'`, `du`, `des`, `à`). With the connector
   listed, a pantry "huile" covers "huile d'olive". Without it, nothing changes.
+  Arabic needs none: it puts the head first without any connector ("زيت زيتون"), so the code
+  takes the first word as the head for any Arabic-script name.
+
+> **Arabic script** is folded before matching: Arabic-Indic digits become ASCII, vowel marks
+> and tatweel are dropped, أ/إ/آ → ا, ى → ي, ة → ه, and the article "ال" is removed from a
+> word's start. List each word once, in its plain spelling: `أرز` already matches "الأرز" and
+> "ارز". Broken plurals (شريحة/شرائح) can't be a suffix rule, so put them in
+> `ingredient_synonyms`; ة → ات (قطرة/قطرات) is handled in code.
 
 And two curated lists, `|`-separated per line — keep both **short**, a wrong entry silently
 merges two real ingredients:

@@ -132,6 +132,32 @@ def test_to_schema_org_coerces_non_numeric_quantity():
     assert s["recipeYield"] is None
 
 
+def test_arabic_aliases_fold_article_and_spelling():
+    ar = load_i18n("ar")
+    # Article, hamza and ة variants all reach the plain alias.
+    assert _normalize_category("اللحوم", ar.category_aliases) == "meat"
+    assert _normalize_category("الحلويات", ar.category_aliases) == "dessert"
+    assert _normalize_meal_types(["الإفطار", "العشاء"], ar.meal_type_aliases) == ["breakfast", "dinner"]
+    # Latin categories are untouched by the fold.
+    assert _normalize_category("Meat", ar.category_aliases) == "meat"
+
+
+def test_to_schema_org_reads_arabic_digit_quantity():
+    recipe = {
+        "title": "Arabisch",
+        "ingredients": [
+            {"quantity": "٤٠٠", "unit": "غ", "name": "دقيق"},
+            {"quantity": "١٫٥", "unit": "كوب", "name": "ماء"},
+        ],
+        "servings": "٤",
+        "steps": [],
+    }
+    s = to_schema_org(recipe, [], i18n=load_i18n("ar"))
+    assert [i["quantity"] for i in s["openCookIngredients"]] == [400, 1.5]
+    assert s["openCookIngredients"][0]["unit"] == "غ"
+    assert s["openCookServings"] == 4
+
+
 def test_to_schema_org_drops_bogus_unit():
     # The model often shoves the ingredient noun into `unit`, which flatten()
     # would render doubled ("8 Zucchini Zucchininudeln"). A unit that overlaps
