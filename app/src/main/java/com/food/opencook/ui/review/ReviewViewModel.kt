@@ -89,6 +89,7 @@ data class EditableRecipe(
     val name: String,
     val servings: String,
     val category: String,
+    val dietType: String,
     /** Selected [com.food.opencook.util.MealTypes] keys; empty = unset (default applies). */
     val mealTypes: List<String>,
     val prepTime: String,
@@ -231,6 +232,7 @@ class ReviewViewModel @Inject constructor(
             name = "",
             servings = "",
             category = "",
+            dietType = "",
             // The classic hot-meal slots pre-selected — same meaning as "unset".
             mealTypes = MealTypes.DEFAULT,
             prepTime = "",
@@ -579,6 +581,7 @@ private fun RecipeWithDetails.toEditable() = EditableRecipe(
     name = recipe.name.orEmpty(),
     servings = recipe.servings?.toString().orEmpty(),
     category = recipe.category.orEmpty(),
+    dietType = recipe.dietType.orEmpty(),
     // Null resolves to the default, so the chips show "lunch + dinner" pre-selected.
     mealTypes = MealTypes.fromStored(recipe.mealTypes),
     prepTime = DurationFormat.toHuman(recipe.prepTime),

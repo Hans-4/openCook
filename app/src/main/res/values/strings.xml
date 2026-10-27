@@ -675,4 +675,12 @@
     <string name="about_privacy_subtitle">No account, no cloud, no tracking. Sync stays on your own network.</string>
     <string name="about_support">Support the project</string>
     <string name="about_support_subtitle">Become a GitHub sponsor</string>
+    <string name="diet_other">Other</string>
+    <string name="diet_pescetarian">Pescetarian</string>
+    <string name="diet_vegan">Vegan</string>
+    <string name="diet_vegetarian">Vegetarian</string>
+    <string name="diet_meat">Meat</string>
+    <string name="cat_drink">Drink</string>
+    <string name="cat_snack">Snack</string>
+    <string name="diet_types">Diet Type</string>
 </resources>

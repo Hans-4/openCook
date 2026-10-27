@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "83afc3856863a323e9d9d98545b77473",
+    "identityHash": "61eb0bdc9c5c7e7fb9f2e1c3cb3bd3b6",
     "entities": [
       {
         "tableName": "recipes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `recipeYield` TEXT, `servings` INTEGER, `category` TEXT, `mealTypes` TEXT, `notes` TEXT, `tags` TEXT, `lastCookedAt` TEXT, `cookbook` TEXT, `sourceUrl` TEXT, `prepTime` TEXT, `cookTime` TEXT, `totalTime` TEXT, `sourcePhotoId` TEXT, `householdId` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `recipeYield` TEXT, `servings` INTEGER, `category` TEXT, `dietType` TEXT, `mealTypes` TEXT, `notes` TEXT, `tags` TEXT, `lastCookedAt` TEXT, `cookbook` TEXT, `sourceUrl` TEXT, `prepTime` TEXT, `cookTime` TEXT, `totalTime` TEXT, `sourcePhotoId` TEXT, `householdId` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -37,6 +37,11 @@
           {
             "fieldPath": "category",
             "columnName": "category",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dietType",
+            "columnName": "dietType",
             "affinity": "TEXT"
           },
           {
@@ -873,7 +878,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '83afc3856863a323e9d9d98545b77473')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61eb0bdc9c5c7e7fb9f2e1c3cb3bd3b6')"
     ]
   }
 }
